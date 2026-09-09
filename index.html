@@ -4,6 +4,39 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Daily Scoop</title>
+<meta name="description" content="A new ice cream flavour to guess every day. Six clues, six guesses, and 460 flavours to choose from.">
+<link rel="canonical" href="https://dailyscoop.site/">
+<meta name="theme-color" content="#E9F2EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#211A19" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Daily Scoop">
+<meta property="og:url" content="https://dailyscoop.site/">
+<meta property="og:title" content="The Daily Scoop">
+<meta property="og:description" content="A new ice cream flavour to guess every day. Six clues, six guesses, and 460 flavours to choose from.">
+<meta property="og:image" content="https://dailyscoop.site/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Daily Scoop, an ice cream cone under a striped parlour awning.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Daily Scoop">
+<meta name="twitter:description" content="A new ice cream flavour to guess every day. Six clues, six guesses, and 460 flavours to choose from.">
+<meta name="twitter:image" content="https://dailyscoop.site/og.png">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 54 64'%3E%3Cpath d='M16 34L27 61L38 34Z' fill='%23E8B45F'/%3E%3Ccircle cx='27' cy='28' r='12' fill='%23D9647A'/%3E%3Ccircle cx='20' cy='17' r='9' fill='%23FFFCF6'/%3E%3Ccircle cx='34' cy='18' r='8.5' fill='%238FB57A'/%3E%3Ccircle cx='27' cy='9' r='3.8' fill='%23C0435C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/icon.png">
+
+<script>
+/* Runs before first paint so a chosen theme never flashes the wrong colours. */
+(function(){
+  try{
+    var t = localStorage.getItem("dailyscoop.theme");
+    if(t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  }catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Rubik:wght@400;500;600;700&display=swap">
@@ -23,9 +56,10 @@
 
   --hit-bg:#5C7C4C;   --hit-fg:#FBFDF9;
   --near-bg:#E8B45F;  --near-fg:#41301B;
-  --miss-bg:#DBD3C5;  --miss-fg:#57493D;
+  --miss-bg:#D2C7B3;  --miss-fg:#4E4134;
 
   --shadow:rgba(62,47,42,.20);
+  --awning-shadow:rgba(62,47,42,.22);
   --hatch:rgba(62,47,42,.05);
   --focus:#C24A63;
 
@@ -48,8 +82,8 @@
     --butterscotch:#E2AC5C; --pistachio:#8FB57A;
     --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
     --near-bg:#C8933F; --near-fg:#241906;
-    --miss-bg:#463A37; --miss-fg:#BDADA1;
-    --shadow:rgba(0,0,0,.45); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+    --miss-bg:#4E403C; --miss-fg:#C6B6A9;
+    --shadow:rgba(0,0,0,.45); --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
   }
 }
 :root[data-theme="dark"]{
@@ -59,8 +93,8 @@
   --butterscotch:#E2AC5C; --pistachio:#8FB57A;
   --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
   --near-bg:#C8933F; --near-fg:#241906;
-  --miss-bg:#463A37; --miss-fg:#BDADA1;
-  --shadow:rgba(0,0,0,.45); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+  --miss-bg:#4E403C; --miss-fg:#C6B6A9;
+  --shadow:rgba(0,0,0,.45); --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
 }
 
 *{box-sizing:border-box;}
@@ -75,6 +109,9 @@ body{
 }
 :focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:5px;}
 
+/* The shadow has to sit on a wrapper. A filter on the awning itself would be
+   applied before the mask and then clipped away with everything else. */
+.awning-wrap{filter:drop-shadow(0 4px 7px var(--awning-shadow));}
 .awning{
   height:68px;
   background:repeating-linear-gradient(90deg, var(--strawberry) 0 32px, var(--surface) 32px 64px);
@@ -86,9 +123,24 @@ body{
     radial-gradient(circle 14px at 14px 0, #000 98%, transparent 100%) 0 100%/28px 14px repeat-x;
 }
 
-.wrap{max-width:740px;margin:0 auto;padding:0 18px 72px;}
-.masthead{display:flex;align-items:center;justify-content:center;gap:15px;padding:30px 0 4px;}
-.masthead svg{flex:none;}
+.wrap{max-width:740px;margin:0 auto;padding:0 18px 72px;position:relative;}
+/* Lifted out of the flow so it stops pushing the masthead down the page. It
+   drops back into the flow on narrow screens, where it would otherwise sit on
+   top of the title. */
+.topbar{position:absolute;top:15px;right:18px;z-index:5;}
+.themebtn{
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-soft);
+  border-radius:999px;padding:6px 14px 6px 11px;font-size:var(--step--1);font-weight:500;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.themebtn:hover:not(:disabled){background:var(--surface-2);filter:none;transform:none;}
+.themebtn i{width:11px;height:11px;border-radius:50%;display:block;flex:none;
+  border:1.5px solid var(--ink-soft);}
+.themebtn i.light{background:var(--butterscotch);border-color:var(--butterscotch);}
+.themebtn i.dark{background:var(--ink-soft);}
+.themebtn i.auto{background:linear-gradient(90deg,var(--butterscotch) 50%,transparent 50%);}
+.masthead{display:flex;align-items:center;justify-content:center;gap:18px;padding:30px 0 4px;}
+.masthead svg{flex:none;width:68px;height:80px;}
 h1{
   font-family:var(--display);
   font-variation-settings:"opsz" 96;
@@ -117,6 +169,18 @@ h1{
 
 .help{padding:2px 4px;}
 .deep{margin-top:44px;}
+.nudge{margin-top:16px;}
+#sgForm{display:flex;flex-direction:column;gap:9px;max-width:52ch;}
+#sgForm input[type="text"], #sgForm textarea{
+  font-family:var(--sans);font-size:var(--step-0);font-weight:400;
+  padding:11px 14px;border:1.5px solid var(--line);border-radius:11px;
+  background:var(--surface-2);color:var(--ink);resize:vertical;
+}
+#sgForm .trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+.sg-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:2px;}
+.sg-msg{font-size:var(--step--1);color:var(--ink-soft);}
+.sg-msg.ok{color:var(--pistachio);font-weight:500;}
+.sg-msg.bad{color:var(--strawberry);font-weight:500;}
 details{border-bottom:1.5px solid var(--line-soft);}
 details:last-child{border-bottom:none;}
 summary{
@@ -176,26 +240,53 @@ summary:hover{background:var(--surface-2);border-radius:10px;}
   border-top:1px dashed var(--line);padding-top:10px;}
 .gl .eg b{color:var(--strawberry);font-weight:600;}
 
-.archgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:4px;}
-.archgrid button{
-  background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);
-  border-radius:11px;padding:10px 6px;text-align:center;
-  display:flex;flex-direction:column;gap:2px;font-weight:600;font-size:var(--step--1);
+.arch-cap{font-size:var(--step--1);color:var(--ink-soft);text-align:center;margin:0 0 10px !important;}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:2px;}
+.cal .dow{
+  text-align:center;font-size:var(--step--2);text-transform:uppercase;
+  letter-spacing:.06em;color:var(--ink-soft);font-weight:600;padding-bottom:3px;
 }
-.archgrid button:hover{background:var(--strawberry-soft);border-color:var(--strawberry);filter:none;}
-.archgrid button em{font-style:normal;font-size:var(--step--2);font-weight:500;
-  color:var(--ink-soft);}
-.archgrid button.today{border-color:var(--strawberry);border-width:2px;}
-.archgrid button.here{background:var(--strawberry);border-color:var(--strawberry);color:#FFF8F9;}
-.archgrid button.here em{color:#FFF8F9;opacity:.85;}
-.archgrid button.done em{color:var(--pistachio);}
+.cal button{
+  aspect-ratio:1;padding:0;border-radius:10px;
+  background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-size:var(--step--1);font-weight:500;font-variant-numeric:tabular-nums;
+}
+.cal button:hover:not(:disabled){background:var(--strawberry-soft);border-color:var(--strawberry);filter:none;transform:none;}
+.cal button:disabled{background:transparent;border-color:transparent;color:var(--ink-soft);opacity:.3;cursor:default;}
+.cal button.solved{background:var(--hit-bg);border-color:var(--hit-bg);color:var(--hit-fg);}
+.cal button.saved{background:var(--near-bg);border-color:var(--near-bg);color:var(--near-fg);}
+.cal button.missed{background:var(--miss-bg);border-color:var(--miss-bg);color:var(--miss-fg);}
+.cal button.started{border-style:dashed;border-color:var(--strawberry);}
+.cal button.today{border-color:var(--strawberry);border-width:2.5px;font-weight:700;}
+.cal button.here{outline:2.5px solid var(--strawberry);outline-offset:2px;}
 
+/* What the board has already proved, so nobody has to hold six columns of
+   bookkeeping in their head four guesses in. */
+.known{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:15px 16px 0;}
+.known .lead{
+  color:var(--ink-soft);font-size:var(--step--2);font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;padding-right:3px;
+}
+.known .kv{
+  display:inline-flex;align-items:baseline;gap:7px;
+  background:var(--hit-bg);color:var(--hit-fg);
+  border-radius:999px;padding:5px 13px;margin:0;
+  font-size:var(--step--1);font-weight:500;line-height:1.4;
+}
+.known .kv em{
+  font-style:normal;opacity:.72;font-size:var(--step--2);
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.answer-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 18px;}
 .board-scroll{overflow-x:auto;padding:16px 16px 6px;}
 .board{min-width:620px;display:flex;flex-direction:column;gap:6px;}
 .row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.row.head{margin-bottom:5px;}
 .head span{
-  font-size:var(--step--2);letter-spacing:.09em;text-transform:uppercase;font-weight:600;
-  color:var(--ink-soft);text-align:center;padding-bottom:3px;
+  font-size:var(--step--1);letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+  color:var(--ink);text-align:center;padding:0 2px 8px;
+  border-bottom:2px solid var(--line);
 }
 .cell{
   border-radius:11px;min-height:60px;
@@ -203,9 +294,13 @@ summary:hover{background:var(--surface-2);border-radius:10px;}
   text-align:center;padding:6px 5px;
   font-size:var(--step--1);font-weight:500;line-height:1.25;overflow-wrap:anywhere;
 }
-.cell.empty{background:var(--surface-2);border:1.5px dashed var(--line);}
+/* An unplayed slot should read as absence, not as a result. Keeping it unfilled
+   with a faint outline pulls it well clear of the grey no-match cells, which
+   otherwise sit at almost the same weight. */
+.cell.empty{background:transparent;border:1.5px dashed var(--line);}
 .cell .mark{font-size:var(--step--2);opacity:.8;letter-spacing:.06em;
   text-transform:uppercase;margin-top:3px;font-weight:600;}
+.cell .clab{display:none;}
 .cell.hit{background:var(--hit-bg);color:var(--hit-fg);}
 .cell.near{background:var(--near-bg);color:var(--near-fg);}
 .cell.miss{background:var(--miss-bg);color:var(--miss-fg);}
@@ -227,11 +322,25 @@ summary:hover{background:var(--surface-2);border-radius:10px;}
   font-family:var(--display);font-variation-settings:"opsz" 20;
   font-size:var(--step-1);font-weight:700;color:var(--strawberry);
   font-variant-numeric:tabular-nums;
+  display:inline-block;transition:transform .3s cubic-bezier(.2,.9,.3,1.5);
 }
+.ticket .n.ticking{transform:scale(1.16);}
 .boardfoot .legend{margin:0;}
 
 .entry{padding:16px;position:relative;}
 .entry-row{display:flex;gap:9px;}
+.hint{margin:10px 3px 1px;font-size:var(--step--1);color:var(--ink-soft);}
+.hint b{color:var(--strawberry);font-weight:600;}
+.entry-foot{display:flex;justify-content:center;margin-top:11px;}
+.linkbtn{
+  background:none;border:none;color:var(--ink-soft);font-size:var(--step--1);
+  font-weight:400;padding:4px 8px;text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--line);
+}
+.linkbtn:hover:not(:disabled){
+  background:none;filter:none;transform:none;
+  color:var(--strawberry);text-decoration-color:var(--strawberry);
+}
 input[type="text"]{
   flex:1;min-width:0;font-family:var(--sans);font-size:var(--step-0);font-weight:400;
   padding:13px 15px;border:1.5px solid var(--line);border-radius:11px;
@@ -320,18 +429,22 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
 .stats h2{font-family:var(--display);font-variation-settings:"opsz" 60;
   font-weight:700;font-size:var(--step-1);margin:0 0 3px;letter-spacing:-.01em;}
 .stats .note{font-size:var(--step--1);color:var(--ink-soft);margin:0 0 18px;}
-.mine{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
-.mine div{flex:1 1 88px;background:var(--surface-2);border-radius:11px;padding:11px 6px;text-align:center;}
+/* A fixed three across never leaves a single tile stranded on its own row the
+   way a wrapping flex row does with six of them. */
+.mine{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.mine div{background:var(--surface-2);border-radius:11px;padding:11px 6px;text-align:center;}
+.mine div.lead{background:var(--strawberry-soft);}
+.mine div.lead strong{color:var(--strawberry);}
 .mine strong{display:block;font-family:var(--display);font-variation-settings:"opsz" 30;
   font-size:var(--step-2);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mine span{font-size:var(--step--2);letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink-soft);font-weight:500;}
 
 .histlist{display:flex;flex-direction:column;gap:2px;}
-.hrow{display:grid;grid-template-columns:56px 1fr auto 50px;gap:10px;align-items:baseline;
+.hrow{display:grid;grid-template-columns:86px 1fr auto 52px;gap:10px;align-items:baseline;
   padding:9px 11px;border-radius:9px;font-size:var(--step--1);}
 .hrow:nth-child(odd){background:var(--surface-2);}
-.hrow .num{color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+.hrow .num{color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap;}
 .hrow .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .hrow .rs{font-size:var(--step--2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
 .hrow .rs.ok{color:var(--pistachio);}
@@ -346,8 +459,32 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
   padding-top:26px;line-height:1.8;}
 [hidden]{display:none !important;}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
+/* Below this width the six columns will not fit side by side without shrinking
+   the text past readable, so each guess wraps into two rows of three instead
+   and the header row gives way to a label inside every cell. Desktop never
+   evaluates any of this. */
+@media (max-width:520px){
+  .board{min-width:0;}
+  .board-scroll{padding:14px 14px 4px;overflow-x:visible;}
+  .row{grid-template-columns:repeat(3,1fr);gap:5px;}
+  .row.head{display:none;}
+  .demo-grid, .answer-row{grid-template-columns:repeat(3,1fr);}
+  .cell{min-height:64px;padding:7px 5px;}
+  .cell.empty{min-height:40px;}
+  .cell .clab{
+    display:block;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
+    font-weight:600;opacity:.62;margin-bottom:3px;line-height:1.1;
+  }
+  .cell.empty .clab{opacity:.5;margin-bottom:0;}
+  .guessed-name{padding:10px 2px 1px;}
+}
+@media (max-width:520px){
+  .topbar{position:static;display:flex;justify-content:flex-end;padding-top:14px;}
+  .masthead{padding:14px 0 4px;gap:13px;}
+}
 @media (max-width:460px){
   h1{font-size:var(--step-3);}
+  .masthead svg{width:52px;height:61px;}
   .wrap{padding:0 12px 56px;}
   .boardfoot{justify-content:center;}
 }
@@ -355,12 +492,18 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
 </head>
 <body>
 
-<div class="awning"></div>
+<div class="awning-wrap"><div class="awning"></div></div>
 
 <div class="wrap">
 
+  <div class="topbar">
+    <button class="themebtn" id="themeBtn" type="button" aria-label="Colour theme">
+      <i id="themeDot"></i><span id="themeName">Auto</span>
+    </button>
+  </div>
+
   <header class="masthead">
-    <svg width="54" height="64" viewBox="0 0 54 64" aria-hidden="true">
+    <svg width="68" height="80" viewBox="0 0 54 64" aria-hidden="true">
       <path d="M16 34 L27 61 L38 34 Z" fill="#E8B45F"/>
       <path d="M18 39 H36 M20.2 45 H33.8 M22.4 51 H31.6" stroke="#BE8B3B" stroke-width="1.5" stroke-linecap="round"/>
       <circle cx="27" cy="28" r="12" fill="#D9647A"/>
@@ -389,12 +532,14 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
             <span class="key k-near"><i></i>Close to it</span>
             <span class="key k-miss"><i></i>Nowhere near</span>
           </div>
+          <p>Amber means the right family but the wrong answer, and only two columns have families. On Consistency, Smooth, Icy and Chewy make up one and Rippled, Chunky, Loaded and Layered the other. On Tradition it means the right continent.</p>
           <p>You get six guesses, and getting there early is worth more. If you run out you still get one last pick from whatever is left standing.</p>
         </div>
       </details>
     </section>
 
     <section class="panel">
+      <div class="known" id="known" hidden></div>
       <div class="board-scroll">
         <div class="board">
           <div class="row head">
@@ -424,6 +569,10 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
                role="combobox" aria-expanded="false" aria-controls="menuList">
         <button id="guessBtn" disabled>Scoop</button>
       </div>
+      <p class="hint" id="entryHint" hidden></p>
+      <div class="entry-foot" id="entryFoot" hidden>
+        <button class="linkbtn" id="giveUpBtn" type="button">Give up and show the answer</button>
+      </div>
       <div class="menu" id="menu" hidden>
         <p class="menu-note" id="menuNote"></p>
         <ul id="menuList" role="listbox"></ul>
@@ -441,6 +590,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     <section class="panel result" id="result" hidden>
       <p class="verdict" id="verdict"></p>
       <p class="answer-name" id="answerName"></p>
+      <div class="answer-row" id="answerRow"></div>
       <p class="score"><b id="points">0</b><span>points</span></p>
       <p class="fact" id="factWhat"></p>
       <p class="fact trivia" id="factTrivia"></p>
@@ -461,8 +611,14 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
       <details id="arch">
         <summary><span class="badge">&#8634;</span> Archive</summary>
         <div class="help-body">
-          <p>The last thirty flavours are all still here. Anything you left unfinished is waiting where you left it, and rounds you play from the archive count towards your record but will not extend your streak.</p>
-          <div class="archgrid" id="archgrid"></div>
+          <p>The last thirty days are all still here. Anything you left unfinished is waiting where you left it, and rounds you play from the archive count towards your record but will not extend your streak.</p>
+          <p class="arch-cap" id="archCap"></p>
+          <div class="cal" id="archgrid"></div>
+          <div class="legend" style="margin-top:14px">
+            <span class="key k-hit"><i></i>Solved</span>
+            <span class="key k-near"><i></i>Last lick</span>
+            <span class="key k-miss"><i></i>Missed</span>
+          </div>
         </div>
       </details>
     </section>
@@ -494,6 +650,24 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     </details>
   </section>
 
+  <section class="panel help nudge">
+    <details id="suggest">
+      <summary><span class="badge">+</span> Suggest a flavour</summary>
+      <div class="help-body">
+        <p>Something obvious missing? Send it over and it will go in the book.</p>
+        <form id="sgForm" novalidate>
+          <input type="text" id="sgName" placeholder="Flavour name" maxlength="60" autocomplete="off">
+          <textarea id="sgNote" rows="3" maxlength="400" placeholder="Anything worth knowing about it, if you like"></textarea>
+          <input type="text" id="sgTrap" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="sg-row">
+            <button type="submit" id="sgBtn">Send it in</button>
+            <span class="sg-msg" id="sgMsg"></span>
+          </div>
+        </form>
+      </div>
+    </details>
+  </section>
+
   <footer>
     A new flavour every day at midnight.<br>
     <span id="rosterNote"></span>
@@ -506,11 +680,235 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
    pool "C" is guessable but too famous to be an answer,
    pool "D" is guessable but too obscure to be an answer,
    pool "A" is the answer pool and needs both text fields filled in. */
+/* One short line per answerable flavour, used only in the shared result.
+   Written to read after "The flavour was X." and kept under about a hundred
+   characters, which is what separates it from the longer reveal fact. */
+window.SPARKS = {
+"French Vanilla":"The name is a method, not a place. It just means the base has egg yolks in it.",
+"Cake Batter":"It outsells chocolate at some American chains, despite being a cake nobody baked.",
+"Fudge Ripple":"The sauce is full of corn syrup purely so it stays soft instead of setting solid.",
+"Moose Tracks":"It is a trademarked recipe, which is why every shop has a near identical tub under another name.",
+"Orange Sherbet":"In America sherbet is legally required to contain a little milkfat. Sorbet is not.",
+"Rainbow Sherbet":"The stripes are never mixed, so no two spoonfuls taste quite the same.",
+"Banana Split":"A pharmacy apprentice invented it and was told off for wasting good fruit.",
+"Espresso Chip":"The chocolate is shaved, not moulded, so it shatters instead of turning waxy.",
+"Peanut Butter Cup":"The chocolate shell is what stops the filling freezing to the texture of chalk.",
+"Rum Raisin":"Without the alcohol the raisins would freeze into stones hard enough to break a tooth.",
+"Maple Walnut":"It takes about forty litres of sap boiled down to make one litre of the syrup.",
+"Praline":"Named after a French diplomat whose cook invented it. He had nothing to do with it.",
+"Pralines and Cream":"The American version swapped the French almond for a pecan and never looked back.",
+"Candy Floss":"The machine that spins it was co-invented by a dentist.",
+"Clotted Cream":"At around sixty percent fat it is about double a normal ice cream base.",
+"Sweet Cream":"It is the base every other flavour is built on, with nowhere to hide a bad one.",
+"Kulfi":"No air is whipped into it at all, which is why it melts so much more slowly.",
+"Root Beer Float":"Sassafras gave it the flavour until it was banned. Everything since is synthetic.",
+"Blue Moon":"No two dairies agree what it is meant to taste of, and the recipe is a secret.",
+"Superman":"The colours are fixed but every dairy picks its own flavours for them.",
+"Hokey Pokey":"It is New Zealand's second favourite flavour, behind only plain vanilla.",
+"Mocha":"It is named after a Yemeni port, and the chocolate came centuries later.",
+"Mojito":"The mint has to be bruised, never chopped, or it turns bitter in minutes.",
+"Margarita":"The salt on the rim exists to trick your tongue into tasting less bitterness.",
+"Rose":"A few drops too many of rose water and the whole batch tastes like soap.",
+"Strawberry Cheesecake":"The biscuit goes soft long before anything else spoils, which makes it a nightmare to sell.",
+"Granita":"It is stirred while freezing on purpose, to keep the ice crystals big.",
+"Chilli":"Cold delays the burn rather than stopping it, so the heat arrives after you swallow.",
+"Blackcurrant":"America banned the plant for most of a century for spreading a disease that killed pine forests.",
+"Sea Salt":"Flaked salt is used because the crystals survive the churn and still crunch.",
+"Lychee":"Most of the perfume is gone within a day of the fruit leaving the tree.",
+"Red Velvet":"The original red came from a reaction between cocoa and buttermilk, not from dye.",
+"Bread and Butter Pudding":"It only works with stale bread, because fresh bread cannot absorb the custard.",
+"Coconut Sorbet":"Coconut has enough fat to make a sorbet that never tastes thin.",
+"Apple Strudel":"Viennese bakers stretch the pastry until you can read a newspaper through it.",
+"Apple Crumble":"The crumble topping was a wartime fix, invented because rationing killed the pastry lid.",
+"Pecan":"The only major tree nut native to North America.",
+"Miso Caramel":"Fermented soy adds a savoury depth to caramel that plain salt cannot.",
+"Basil":"The leaves must be blanched first or the whole batch turns brown overnight.",
+"Red Bean":"Beans as dessert predates sugar in East Asia by a very long way.",
+"Jasmine":"The tea is never flavoured. Blossoms are laid beside the leaves overnight, then thrown away.",
+"Rhubarb":"The stalks are fine but the leaves are genuinely poisonous.",
+"Madeleine":"French bakers judge one almost entirely on the bump that rises on its back.",
+"Bingsu":"The ice is shaved from frozen milk, not water, so it collapses instead of crunching.",
+"Pavlova":"Australia and New Zealand have been arguing over who invented it for a century.",
+"Christmas Pudding":"It keeps for a year because the fruit is soaked in enough spirit to stop anything growing.",
+"Tutti Frutti":"The name just means all fruits, which is unusually honest.",
+"Pear":"Pears ripen from the inside out, so by the time the outside feels ready the middle has gone.",
+"Goat Cheese":"The smell reads as barnyard when warm and as bright when cold.",
+"Pumpkin":"Blind tastings routinely fail to detect whether any pumpkin is in it at all.",
+"Tahini":"Unsweetened it needs salt as much as sugar, which puts it closer to a nut butter.",
+"Bacio":"Every chocolate it is named after hides a love note inside the wrapper.",
+"Peanut Butter and Jelly":"The pairing spread through wartime army ration kits, where both came issued together.",
+"Lemon Meringue":"The meringue has to go in frozen or it dissolves into syrup overnight.",
+"Rice Pudding":"The starch from the rice does the same job a commercial stabiliser does.",
+"White Chocolate":"It has no cocoa solids at all, which is why America refused to call it chocolate.",
+"Mint":"Menthol switches on the nerves that detect cold. Nothing has actually changed temperature.",
+"Profiterole":"The pastry puffs on steam alone, with no raising agent whatsoever.",
+"Pina Colada":"Raw pineapple contains an enzyme that curdles cream, so the fruit has to be cooked first.",
+"Taro":"It is barely purple on its own. Almost all the colour you see has been helped along.",
+"Cannoli":"Sicilians fill the shells to order, because one filled in advance goes soft within the hour.",
+"Trifle":"The layers are structural. Each has to set before the next goes on.",
+"Nougat":"The protected Montelimar version has to be at least thirty percent almonds by law.",
+"Thai Tea":"The orange colour is food dye and has nothing to do with the tea.",
+"Mixed Berry":"Freezing is what made it possible, since no two of the berries ripen at once.",
+"Cardamom":"Ground cardamom loses most of its oils within weeks, so the pods go in whole.",
+"Raspberry":"Not a berry at all, but dozens of tiny fruits fused around a hollow core.",
+"Peach Melba":"Escoffier invented it for an opera singer and served it on a swan carved from ice.",
+"Condensed Milk":"It needs no fridge, which is why it took hold everywhere fridges did not.",
+"Gianduja":"Napoleon's blockade cut off cocoa, so Turin stretched it with hazelnuts and improved it.",
+"Macaron":"The shells only grow their ruffled foot if you leave them out until they stop being sticky.",
+"Champagne Sorbet":"Alcohol lowers the freezing point, so it can never set hard enough to scoop.",
+"Portuguese Tart":"Monks starched their habits with egg white and invented these to use up the yolks.",
+"Ricotta":"The name means recooked, because it is made from the whey another cheese left behind.",
+"Coconut Macaroon":"No flour at all, which is exactly why it became a Passover fixture.",
+"Hojicha":"Roasting burns off most of the caffeine, so it is what Japanese children drink.",
+"Ginger Beer":"It was brewed from a live culture that households passed around like a sourdough starter.",
+"Blackberry":"Nobody has ever had to farm it, because it grows wild in every hedgerow.",
+"Lemonade":"The cloudy American drink and the clear fizzy British one are entirely different things.",
+"Millefeuille":"The name claims a thousand leaves. The real count is about seven hundred and thirty.",
+"Blackberry Crumble":"Raw blackberries release enough water to turn any crumble topping to porridge.",
+"Avocado":"Fatty enough to set like custard with no cream at all, and botanically a berry.",
+"Panna Cotta":"A good one is set with the least gelatine that will still let it stand up.",
+"Banoffee":"Invented in one Sussex restaurant in 1971, and the sign outside still says so.",
+"Snickerdoodle":"The tang comes from cream of tartar, scraped off the inside of wine barrels.",
+"Espresso Martini":"Invented in Soho when a customer asked for something to wake her up and get her drunk.",
+"Chai":"There is no fixed recipe, and asking for chai tea in India is asking for tea tea.",
+"Sticky Toffee":"The sweetness comes from dates rather than sugar, which is what keeps it moist.",
+"Sake":"It is brewed rather than distilled, which makes it closer to beer than to wine.",
+"White Russian":"The original had no cream in it at all.",
+"Rhubarb and Custard":"The best rhubarb is grown in dark sheds and harvested by candlelight.",
+"Chocolate Hazelnut":"About a fifth of the world's hazelnut crop goes into a single brand of spread.",
+"Elderflower":"The blossoms must be picked dry and used the same day or the perfume turns animal.",
+"Durian":"Banned on the Singapore metro, and the smell is part onion, part rotten egg, part honey.",
+"Wasabi":"Real wasabi loses nearly all its heat fifteen minutes after grating.",
+"Plum":"Salted and dried, the same fruit becomes a savoury snack nobody connects to the fresh one.",
+"Affogato":"The name means drowned, and it is really an instruction rather than a flavour.",
+"Nectarine":"Genetically it is a peach with one gene switched off, the one that grows fuzz.",
+"Brown Sugar Boba":"The pearls are pure tapioca starch, which goes stubbornly hard if truly frozen.",
+"Biscoff":"It reached the world by being handed out free with airline coffee.",
+"Chestnut":"A nut with almost no fat and a great deal of starch, which is why it roasts like a vegetable.",
+"Orange Blossom":"It is distilled from the bitter orange tree, the same one that gives us marmalade.",
+"Passionfruit Sorbet":"The pulp is acidic enough to curdle milk on contact.",
+"Rum":"It is made from molasses, the waste product nobody wanted from sugar refining.",
+"Apricot":"The kernel inside the stone tastes strongly of almond.",
+"Tres Leches":"The sponge is baked deliberately dry so it can absorb more than its own weight.",
+"Vanilla Bean":"For centuries the orchid would only fruit in Mexico, because one local bee could pollinate it.",
+"Hibiscus":"The part used is not the petal but the calyx left behind, and it stains permanently.",
+"Irish Coffee":"The cream only floats if the coffee underneath has been sweetened.",
+"Black Cherry":"Cherry stones contain the compound that makes almonds taste of almond.",
+"Butterscotch":"The butter and brown sugar go in together, which is what separates it from caramel.",
+"Malted Milk":"The powder was invented as a food for invalids and taken to the Antarctic by explorers.",
+"Lamington":"The story is that a cook dropped a sponge cake into chocolate and rolled it in coconut.",
+"Strawberry Shortcake":"The American version uses a split biscuit, which soaks instead of going soggy.",
+"Persimmon":"It is mouth-puckeringly astringent until it turns to honey almost overnight.",
+"Doughnut":"The hole exists so the middle cooks before the outside burns.",
+"Pomegranate":"A single fruit can hold well over six hundred seeds.",
+"Parmesan":"Aged parmesan is full of the same crunchy crystals you find in good caramel.",
+"Kahlua":"The coffee and the rum in it both come from the same country.",
+"Raspberry Sorbet":"Sieving the seeds out costs about a third of the fruit by weight.",
+"Egg Nog":"Dairies treat it as a six week product, which is why you can never find it in March.",
+"Halo Halo":"The name means mix mix, and the instruction is meant seriously.",
+"Pumpkin Spice":"There is no pumpkin in the spice blend and there never was.",
+"Creme Brulee":"Caramel pulls moisture from whatever it touches, so the shards dissolve if you wait.",
+"Earl Grey":"Bergamot is a bitter citrus grown almost entirely on one stretch of Calabrian coast.",
+"Mulled Wine":"Spicing wine began as a way to rescue barrels that had started to turn.",
+"Cheese":"A Filipino freezer staple sold from brightly painted carts, made with processed cheese.",
+"Brownie Batter":"Selling raw batter only became legal once flour started being heat treated.",
+"Flan":"The caramel goes into the bottom of the tin and ends up on top.",
+"Chocolate Malt":"Malt powder was invented as a health food for infants.",
+"Gooseberry":"Victorian growers held competitions for the heaviest single berry, and some still run.",
+"Corn":"Mexican street versions add the same chilli, lime and cheese that go on a grilled cob.",
+"Turron":"The hard Alicante bar is two thirds almonds, bound with only honey and egg white.",
+"Gingerbread":"Nuremberg has made its protected version since the 1300s, with almost no flour in it.",
+"Jelly Bean":"The shell is put on by tumbling the sweets for days, a technique borrowed from pill making.",
+"Toffee Apple":"The shell has to hit the hottest sugar goes before it burns, or you get glue.",
+"Poppy Seed":"The seeds are ground with milk in a special mill, a trick older than ice cream itself.",
+"Cream Soda":"It has never contained cream. The name refers to cream of tartar.",
+"Cantaloupe":"Named after a papal estate outside Rome where the seeds were first grown in Europe.",
+"Prosecco":"It ferments in a tank rather than the bottle, which is why it costs a fraction of champagne.",
+"Eclair":"The name means flash of lightning, for how fast you are meant to eat it.",
+"Pecan Pie":"The nuts float to the top on their own as it bakes.",
+"Victoria Sponge":"Still the standard technical test at village baking competitions across Britain.",
+"Gin and Tonic":"Tonic came first as a malaria treatment, and the gin made the quinine bearable.",
+"Papaya":"It contains an enzyme so good at breaking down protein that it is sold as meat tenderiser.",
+"Saffron":"Each crocus gives exactly three threads and every one is picked by hand.",
+"Baked Alaska":"Meringue is full of air pockets, so it genuinely insulates the ice cream in a hot oven.",
+"Chocolate Sorbet":"Taking the milk out makes the cocoa taste stronger, not weaker.",
+"Greek Yoghurt":"Straining it takes roughly four times as much milk for the same weight.",
+"Blood Orange Sorbet":"The red only develops if the nights turn cold enough while the fruit is on the tree.",
+"Limoncello":"Only the peel goes in. Any pith at all turns the whole batch bitter.",
+"Baileys":"Cream and whiskey separate on contact, so the real invention was the emulsifier.",
+"Cranberry":"They are harvested by flooding the field, because ripe ones float and unripe ones sink.",
+"Green Apple":"Nearly all the aroma sits in the skin, which is why a peeled apple tastes of so little.",
+"Boysenberry":"Every plant alive came from a few dying vines rescued from an abandoned Californian farm.",
+"Honeydew":"It does not sweeten at all after picking, so a bad one was always going to be bad.",
+"Cocoa Nib":"This is what chocolate tastes like before anything is added to it.",
+"Turkish Delight":"It is set with starch rather than gelatine, which predates gelatine by centuries.",
+"Basque Cheesecake":"It is burnt on purpose, and the bar that invented it published the recipe for free.",
+"Kiwifruit":"It contains an enzyme that dissolves protein, which is why a lot of it makes your tongue tingle.",
+"Chocolate Sea Salt":"Salt suppresses bitterness, so a pinch makes dark chocolate taste sweeter.",
+"Grapefruit":"It appeared by accident in Barbados as a natural cross nobody planned.",
+"Sakura":"The blossoms are pickled in salt first, which is why it arrives faintly savoury.",
+"Marmalade":"Seville oranges are too bitter to eat and are grown almost entirely for this.",
+"Milk Tea":"Hong Kong strains it through a cloth bag stained permanently brown, hence the local nickname.",
+"Apple Pie":"The pastry has to go in frozen and in big pieces or it turns to paste overnight.",
+"Chocolate Mint":"Cooling and bitter have been served together for centuries longer than the ice cream.",
+"Chocolate Coconut":"Coconut fat and cocoa butter set at almost exactly the same temperature.",
+"Frozen Yoghurt":"It has boomed and collapsed twice, both times because shops opened faster than demand.",
+"Cashew":"It grows on the outside of a fruit, in a shell too caustic to touch before roasting.",
+"French Toast":"The French name for it translates as lost bread, which says what it was for.",
+"Date":"Medjool dates are sweet enough to carry a whole batch with no sugar added at all.",
+"Semifreddo":"It holds enough whipped cream to stay soft in a freezer with no churning at all.",
+"Bourbon":"American law demands a brand new charred barrel every time, which is where the vanilla comes from.",
+"Yuzu":"It is nearly all peel and seed, and whole fruits are floated in hot baths at midwinter.",
+"Eton Mess":"The story is that a dog sat on a picnic basket at Eton and crushed the pavlova.",
+"Whisky":"Peat smoke survives freezing better than almost anything, because it is carried in oils.",
+"Jackfruit":"The largest fruit that grows on any tree, with single ones reaching forty kilos.",
+"Mandarin":"Almost every sweet orange on earth descends from crossing this with a pomelo.",
+"Halva":"It is pulled like taffy while warm, which is what makes a good one flake apart.",
+"Black Forest":"German law requires the cake it copies to contain kirsch, the cherry spirit.",
+"Amaretto":"The bitter almond note usually comes from apricot kernels rather than almonds.",
+"Nutmeg":"Two spices come off the same seed. The red webbing around it is mace.",
+"Orange Creamsicle":"The shell and the centre freeze at different rates, which is the whole trick.",
+"Liquorice":"The root is about fifty times sweeter than sugar, and the sweetness refuses to leave.",
+"Churro":"The ridges are not decoration. They crisp the outside before the inside turns greasy.",
+"Sangria":"The fruit is left in to sweeten the wine, so the drink began as a way to rescue bad bottles.",
+"Chocolate Orange":"An orange's aroma lives in the peel, not the juice.",
+"Panettone":"The loaf is hung upside down to cool or the crumb collapses under its own weight.",
+"Chocolate Truffle":"They are named after the fungus because the first ones looked freshly dug up.",
+"Waffle":"The cone was improvised at a World's Fair when a stall next door ran out of dishes.",
+"Key Lime Pie":"The filling sets with no heat at all, because the lime acid thickens the milk chemically.",
+"Peanut Brittle":"Bicarbonate of soda foams the molten sugar, which is what makes it snap instead of shatter teeth.",
+"Marzipan":"Lübeck legend says it was invented during a siege, when almonds and sugar were all that was left.",
+"Guava":"It holds several times more vitamin C by weight than an orange.",
+"Olive Oil":"A good oil makes you cough, and in Italy the cough is a mark of quality.",
+"Sachertorte":"Two Viennese institutions fought a seven year court case over the name.",
+"Walnut":"The bitterness is all in the papery skin, and it worsens with age.",
+"Chamomile":"The Greek name for the plant means earth apple, which is exactly what it smells of.",
+"Triple Chocolate":"The three chocolates set at different temperatures, so the order they go in matters.",
+"Blueberry Muffin":"Bakers flour the berries first or every one sinks to the bottom of the tin.",
+"Honey":"Honey never fully freezes, so it keeps the whole tub softer than sugar would.",
+"Lavender":"Culinary lavender is bred low in camphor, the compound behind the soapy taste.",
+"Cherry Pie":"Sour cherries are used almost exclusively, because sweet ones cook to mush.",
+"Fig":"A fig is not really a fruit but an inverted flower that blooms on the inside.",
+"Raspberry Cheesecake":"The acid in the fruit thickens the cheese further, so it sets harder than a plain one.",
+"Acai":"Brazil eats it as a savoury dish with fish, because on its own it is barely sweet.",
+"Macadamia":"Australian by origin but commercialised in Hawaii, which is why nobody thinks it is Australian.",
+"Pandan":"Often called the vanilla of Southeast Asia, and the leaves are steeped then thrown away.",
+"Mint Tea":"It is poured from a great height on purpose, to aerate it and build the foam.",
+"Sweet Potato":"Roasting converts its starch to sugar, so roasted tastes twice as sweet as boiled.",
+"Tarte Tatin":"Two sisters burnt a pan of apples, threw pastry over the top to save it, and served it upside down.",
+"Almond Croissant":"It was invented to use up yesterday's unsold croissants.",
+"Mascarpone":"It is set with acid and has no culture added, so technically it is not a cheese.",
+"Custard Tart":"The nutmeg on top has been part of the recipe since the medieval version.",
+"Cola":"Most of the flavour is orange, lime and cinnamon oil.",
+"Baklava":"The pastry has to go in at the last moment or the syrup turns every shard to paste.",
+"Dragonfruit":"The plant is a cactus that flowers for one night and has to be pollinated before dawn."
+};
+
 window.FLAVOUR_BOOK = [
 
 /* ---------------- too famous to be an answer ---------------- */
 ["Vanilla","Creamy","Cream","Smooth","Bean or pod","French","Classic","C","",""],
-["French Vanilla","Creamy","Yellow","Smooth","Dairy","French","Parlour","C","",""],
+["French Vanilla","Creamy","Yellow","Smooth","Dairy","French","Parlour","A","Vanilla built on a cooked egg custard, which turns it yellow and gives it a heavier, richer body than the plain kind.","The name describes a method rather than a place. French style means an egg yolk base, and the plainer eggless version is called Philadelphia style."],
 ["Chocolate","Sweet","Brown","Smooth","Bean or pod","Italian","Classic","C","",""],
 ["Milk Chocolate","Sweet","Brown","Smooth","Bean or pod","Central European","Parlour","C","",""],
 ["Dark Chocolate","Bitter","Brown","Smooth","Bean or pod","French","Modern","C","",""],
@@ -541,42 +939,42 @@ window.FLAVOUR_BOOK = [
 ["Dulce de Leche","Sweet","Brown","Rippled","Dairy","Latin American","Classic","C","",""],
 ["Stracciatella","Creamy","Cream","Chunky","Confection","Italian","Parlour","C","",""],
 ["Birthday Cake","Sweet","White","Chunky","Grain","American","Modern","C","",""],
-["Cake Batter","Sweet","Cream","Smooth","Grain","American","Modern","C","",""],
+["Cake Batter","Sweet","Cream","Smooth","Grain","American","Modern","A","Raw vanilla sponge mix, sweet and faintly floury, usually with sprinkles running through it.","It became the single best selling flavour at one large American chain, which is remarkable for something that is essentially a cake nobody baked."],
 ["Toffee","Sweet","Tan","Smooth","Confection","British","Classic","C","",""],
 ["Honeycomb","Sweet","Tan","Chunky","Confection","British","Parlour","C","",""],
-["Hokey Pokey","Sweet","Cream","Chunky","Confection","Antipodean","Parlour","C","",""],
-["Fudge Ripple","Sweet","Brown","Rippled","Confection","American","Parlour","C","",""],
+["Hokey Pokey","Sweet","Cream","Chunky","Confection","Antipodean","Parlour","A","Vanilla with lumps of honeycomb toffee through it, and a New Zealand institution.","It sits behind only plain vanilla in New Zealand sales, and the name is far older than the ice cream, having been shouted by street vendors in Victorian Britain."],
+["Fudge Ripple","Sweet","Brown","Rippled","Confection","American","Parlour","A","Vanilla with a thick dark chocolate sauce folded through it in ribbons.","The sauce is loaded with corn syrup so that it stays soft in the freezer rather than setting into a solid brown seam you cannot get a spoon through."],
 ["Chocolate Fudge Brownie","Sweet","Brown","Chunky","Grain","American","Modern","C","",""],
-["Moose Tracks","Sweet","Cream","Loaded","Confection","American","Modern","C","",""],
+["Moose Tracks","Sweet","Cream","Loaded","Confection","American","Modern","A","Vanilla loaded with peanut butter cups and a fudge ripple running through it.","It is a trademarked recipe licensed out to dairies rather than a generic flavour, which is why every supermarket carries a near identical tub under another name."],
 ["S'mores","Sweet","Brown","Loaded","Confection","American","Modern","C","",""],
-["Orange Sherbet","Tart","Orange","Icy","Fruit","American","Parlour","C","",""],
-["Rainbow Sherbet","Fruity","Multi","Layered","Fruit","American","Parlour","C","",""],
-["Banana Split","Sweet","Multi","Loaded","Fruit","American","Parlour","C","",""],
-["Mocha","Bitter","Brown","Smooth","Bean or pod","American","Parlour","C","",""],
-["Espresso Chip","Bitter","Brown","Chunky","Bean or pod","Italian","Modern","C","",""],
-["Peanut Butter Cup","Sweet","Brown","Chunky","Nut","American","Modern","C","",""],
+["Orange Sherbet","Tart","Orange","Icy","Fruit","American","Parlour","A","Sharp orange, lighter than ice cream but not quite a sorbet, with a little dairy in it.","Sherbet is a legally defined category in the United States and has to contain between one and two percent milkfat, which is the only thing separating it from sorbet."],
+["Rainbow Sherbet","Fruity","Multi","Layered","Fruit","American","Parlour","A","Three fruit sherbets laid side by side, most often orange, raspberry and lime.","They are laid in stripes rather than mixed so no two spoonfuls taste the same, and the three flavours vary by producer with no standard at all."],
+["Banana Split","Sweet","Multi","Loaded","Fruit","American","Parlour","A","The whole sundae in one tub: banana, chocolate, strawberry, nuts and cherry.","It was invented by a twenty three year old pharmacy apprentice in Pennsylvania, who was told off by his employer for wasting good fruit on it."],
+["Mocha","Bitter","Brown","Smooth","Bean or pod","American","Parlour","A","Coffee and chocolate together, more bitter than either one on its own.","It is named after the Yemeni port that shipped the beans, and the pairing with chocolate came centuries later and had nothing to do with the place."],
+["Espresso Chip","Bitter","Brown","Chunky","Bean or pod","Italian","Modern","A","Strong coffee with fine shavings of dark chocolate running through it.","The chocolate is shaved rather than moulded into chips, so it shatters on the tongue instead of turning waxy the way a solid chip does in the cold."],
+["Peanut Butter Cup","Sweet","Brown","Chunky","Nut","American","Modern","A","Chocolate with pieces of peanut butter cup through it, salty and sweet at once.","The chocolate shell around each piece is what stops the filling freezing to the texture of chalk, which is exactly what happens to plain peanut butter."],
 ["Hazelnut","Toasty","Tan","Smooth","Nut","Italian","Classic","C","",""],
 ["Almond","Toasty","Cream","Smooth","Nut","Italian","Classic","C","",""],
-["Rum Raisin","Sweet","Cream","Chunky","Fruit","Italian","Classic","C","",""],
-["Maple Walnut","Toasty","Tan","Chunky","Nut","American","Parlour","C","",""],
-["Praline","Toasty","Tan","Chunky","Nut","French","Classic","C","",""],
-["Pralines and Cream","Toasty","Cream","Chunky","Nut","American","Parlour","C","",""],
+["Rum Raisin","Sweet","Cream","Chunky","Fruit","Italian","Classic","A","Cream with raisins soaked in rum until they are plump and faintly boozy.","The alcohol is doing structural work rather than just adding flavour. Without it the raisins would freeze into little stones hard enough to break a tooth on."],
+["Maple Walnut","Toasty","Tan","Chunky","Nut","American","Parlour","A","Maple syrup and toasted walnuts, a fixture across Canada and New England.","It takes roughly forty litres of sap boiled down to make a single litre of the syrup, and one mature tree yields only enough for a few tins a season."],
+["Praline","Toasty","Tan","Chunky","Nut","French","Classic","A","Caramelised almonds crushed to a sweet, nutty paste and stirred through cream.","It is named after a seventeenth century French diplomat whose cook first candied almonds for him, and the man himself had nothing to do with inventing it."],
+["Pralines and Cream","Toasty","Cream","Chunky","Nut","American","Parlour","A","Vanilla with candied pecans and threads of caramel through it.","The American version swapped the French almond for a pecan and drowned it in caramelised sugar, which is why it tastes almost nothing like the original."],
 ["Bubblegum","Sweet","Pink","Chunky","Confection","American","Parlour","C","",""],
-["Candy Floss","Sweet","Pink","Smooth","Confection","American","Modern","C","",""],
+["Candy Floss","Sweet","Pink","Smooth","Confection","American","Modern","A","Spun sugar, very sweet and faintly floral, almost always dyed pink.","The machine that spins it was co-invented by a dentist, which remains the least likely fact about any confection in this book."],
 ["Marshmallow","Sweet","White","Rippled","Confection","American","Parlour","C","",""],
 ["Custard","Creamy","Yellow","Smooth","Dairy","British","Classic","C","",""],
-["Clotted Cream","Creamy","Cream","Smooth","Dairy","British","Classic","C","",""],
-["Sweet Cream","Creamy","Cream","Smooth","Dairy","American","Classic","C","",""],
+["Clotted Cream","Creamy","Cream","Smooth","Dairy","British","Classic","A","Very rich, slightly cooked cream, the kind that goes on a scone before the jam.","It is baked slowly until a crust forms on top and comes out at around sixty percent fat, roughly double what a normal ice cream base contains."],
+["Sweet Cream","Creamy","Cream","Smooth","Dairy","American","Classic","A","The plain base with nothing added, tasting of milk and sugar and very little else.","It is what every other flavour in a shop is built on, which makes it the honest test of a place, because there is nothing to hide a badly made base behind."],
 ["Cinnamon","Herbal","Tan","Smooth","Spice","Central European","Classic","C","",""],
 ["Ginger","Herbal","Cream","Smooth","Root","British","Classic","C","",""],
-["Kulfi","Creamy","Cream","Smooth","Dairy","South Asian","Classic","C","",""],
+["Kulfi","Creamy","Cream","Smooth","Dairy","South Asian","Classic","A","Dense Indian frozen milk, cooked down slowly until thick and faintly caramelised.","The milk is boiled for hours rather than whipped, so no air goes into it at all, which is why it is far denser than ice cream and melts much more slowly."],
 ["Ube","Creamy","Purple","Smooth","Root","SE Asian","Parlour","C","",""],
 ["Black Sesame","Toasty","Grey","Smooth","Seed","Japanese","Parlour","C","",""],
 ["Green Tea","Bitter","Green","Smooth","Leaf","Japanese","Parlour","C","",""],
 ["Mochi","Sweet","White","Chewy","Grain","Japanese","Modern","C","",""],
-["Root Beer Float","Sweet","Brown","Smooth","Root","American","Parlour","C","",""],
-["Blue Moon","Sweet","Blue","Smooth","Confection","American","Parlour","C","",""],
-["Superman","Sweet","Multi","Layered","Confection","American","Parlour","C","",""],
+["Root Beer Float","Sweet","Brown","Smooth","Root","American","Parlour","A","Vanilla and root beer together, sweet with a faintly medicinal edge.","The original flavour came from sassafras, which was banned in the 1960s once it was found to be carcinogenic, so everything sold since has been synthetic."],
+["Blue Moon","Sweet","Blue","Smooth","Confection","American","Parlour","A","A bright blue Midwestern flavour nobody can quite describe, somewhere near marshmallow and citrus.","The recipe is closely held and no two dairies agree on what it is supposed to taste of, which has not stopped it becoming a regional institution."],
+["Superman","Sweet","Multi","Layered","Confection","American","Parlour","A","Three brightly coloured stripes in one scoop, an institution across Michigan.","The colours are fixed but the flavours are not. Each dairy chooses its own, so the same scoop tastes different depending which side of the state you bought it on."],
 ["Pineapple","Tart","Yellow","Icy","Fruit","American","Parlour","C","",""],
 ["Lime","Tart","Green","Icy","Fruit","Latin American","Parlour","C","",""],
 ["Watermelon","Fruity","Pink","Icy","Fruit","Middle Eastern","Modern","C","",""],
@@ -982,7 +1380,8 @@ window.FLAVOUR_BOOK = [
 
 var FLAVOURS = (window.FLAVOUR_BOOK || []).map(function(r){
   return {n:r[0], note:r[1], col:r[2], con:r[3], src:r[4], trad:r[5], era:r[6],
-          pool:r[7], what:r[8] || "", trivia:r[9] || ""};
+          pool:r[7], what:r[8] || "", trivia:r[9] || "",
+          spark:(window.SPARKS && window.SPARKS[r[0]]) || ""};
 });
 
 var HOMOGENEOUS = ["Smooth","Icy","Chewy"];
@@ -991,6 +1390,7 @@ var SCORE = [15,12,9,7,5,3];
 var LICK_SCORE = 1;
 var EPOCH = Date.UTC(2026,0,1);
 var ARCHIVE_DAYS = 30;
+var SITE = "dailyscoop.site";
 
 var COLUMNS = [
   {key:"note", label:"Note",
@@ -1010,7 +1410,7 @@ var COLUMNS = [
    vals:["Bean or pod","Fruit","Nut","Seed","Leaf","Root","Flower","Spice","Grain","Dairy","Confection"],
    eg:"Vanilla, chocolate and coffee are all <b>bean or pod</b>, which is rarely the first thing anybody thinks of."},
   {key:"trad", label:"Tradition",
-   blurb:"The cooking culture a flavour belongs to, rather than wherever the tub happened to be manufactured.",
+   blurb:"The cooking culture a flavour belongs to, rather than wherever the tub happened to be manufactured. Guess the wrong culture from the right continent and the cell turns amber.",
    vals:["American","Italian","British","French","Central European","Nordic","Iberian","Japanese","Chinese","Korean","SE Asian","South Asian","Middle Eastern","Latin American","Antipodean"],
    eg:"Stracciatella is <b>Italian</b> and hokey pokey is <b>Antipodean</b>."},
   {key:"era", label:"Era",
@@ -1045,11 +1445,35 @@ function answerFor(day){
   var n = ANSWER_ORDER.length;
   return FLAVOURS[ANSWER_ORDER[((day % n) + n) % n]];
 }
+
+/* Day numbers are an internal counter. Anything a player sees should be a date.
+   EPOCH is a UTC midnight, so every format below reads back in UTC to avoid the
+   date sliding by one for anyone west of Greenwich. */
+function dateFor(day){ return new Date(EPOCH + day * 86400000); }
+function fmtDate(day, opts){
+  opts = opts || {};
+  opts.timeZone = "UTC";
+  return dateFor(day).toLocaleDateString(undefined, opts);
+}
+function fmtShort(day){ return fmtDate(day, {weekday:"short", day:"numeric", month:"short"}); }
+function fmtLong(day){ return fmtDate(day, {weekday:"long", day:"numeric", month:"long"}); }
+var CONTINENT = {
+  "American":"Americas", "Latin American":"Americas",
+  "Italian":"Europe", "British":"Europe", "French":"Europe",
+  "Central European":"Europe", "Nordic":"Europe", "Iberian":"Europe",
+  "Japanese":"Asia", "Chinese":"Asia", "Korean":"Asia",
+  "SE Asian":"Asia", "South Asian":"Asia", "Middle Eastern":"Asia",
+  "Antipodean":"Oceania"
+};
 function conState(g, a){
   if(g === a) return "hit";
   var gh = HOMOGENEOUS.indexOf(g) > -1;
   var ah = HOMOGENEOUS.indexOf(a) > -1;
   return gh === ah ? "near" : "miss";
+}
+function tradState(g, a){
+  if(g === a) return "hit";
+  return (CONTINENT[g] && CONTINENT[g] === CONTINENT[a]) ? "near" : "miss";
 }
 function cmp(g, a){
   return [
@@ -1057,7 +1481,7 @@ function cmp(g, a){
     {t:g.col,  s:g.col  === a.col  ? "hit" : "miss"},
     {t:g.con,  s:conState(g.con, a.con)},
     {t:g.src,  s:g.src  === a.src  ? "hit" : "miss"},
-    {t:g.trad, s:g.trad === a.trad ? "hit" : "miss"},
+    {t:g.trad, s:tradState(g.trad, a.trad)},
     {t:g.era,  s:g.era  === a.era  ? "hit" : "miss"}
   ];
 }
@@ -1065,6 +1489,83 @@ function key(r){ return r.map(function(c){ return c.s; }).join("|"); }
 function byName(n){
   for(var i = 0; i < FLAVOURS.length; i++){ if(FLAVOURS[i].n === n) return FLAVOURS[i]; }
   return null;
+}
+
+/* ---------------- reading what the player meant ----------------
+   Case, apostrophes and spacing should never cost anyone a guess, and neither
+   should a slipped letter. Anything genuinely unrecognisable is still refused,
+   because silently turning nonsense into a real flavour would burn a guess. */
+function norm(s){
+  return String(s).toLowerCase()
+    .replace(/[''`.,!?]/g, "")
+    .replace(/[-_/]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function squash(s){ return norm(s).replace(/ /g, ""); }
+
+var BY_NORM = {}, BY_SQUASH = {};
+FLAVOURS.forEach(function(f){
+  BY_NORM[norm(f.n)] = f;
+  var sq = squash(f.n);
+  if(!BY_SQUASH[sq]) BY_SQUASH[sq] = f;
+});
+
+/* Famous flavours win a tie against obscure ones, since that is almost always
+   what somebody fumbling a spelling actually meant. */
+var POOL_RANK = {C:0, A:1, D:2};
+function prefixLen(a, b){
+  var i = 0, m = Math.min(a.length, b.length);
+  while(i < m && a.charCodeAt(i) === b.charCodeAt(i)) i++;
+  return i;
+}
+
+/* Levenshtein, abandoned as soon as it cannot come in under budget. */
+function lev(a, b, max){
+  var m = a.length, n = b.length;
+  if(Math.abs(m - n) > max) return max + 1;
+  var prev = [], cur = [], i, j;
+  for(j = 0; j <= n; j++) prev[j] = j;
+  for(i = 1; i <= m; i++){
+    cur[0] = i;
+    var best = i;
+    for(j = 1; j <= n; j++){
+      var cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      if(cur[j] < best) best = cur[j];
+    }
+    if(best > max) return max + 1;
+    var t = prev; prev = cur; cur = t;
+  }
+  return prev[n];
+}
+
+function resolve(raw){
+  var s = norm(raw);
+  if(!s) return null;
+  if(BY_NORM[s]) return BY_NORM[s];
+
+  var sq = squash(raw);
+  if(BY_SQUASH[sq]) return BY_SQUASH[sq];
+
+  var pre = FLAVOURS.filter(function(f){ return norm(f.n).indexOf(s) === 0; });
+  if(pre.length === 1) return pre[0];
+
+  /* One slip on a short word, three on a long one. Ties are broken first by how
+     well known the flavour is and then by how much of the opening matches, so
+     starberry lands on Strawberry rather than on Tayberry, which sits at the
+     same edit distance. A tie that survives all three tests is refused. */
+  var budget = s.length <= 4 ? 1 : (s.length <= 8 ? 2 : 3);
+  var cands = [];
+  FLAVOURS.forEach(function(f){
+    var d = lev(s, norm(f.n), budget);
+    if(d <= budget) cands.push({f:f, d:d, rank:POOL_RANK[f.pool], pre:prefixLen(s, norm(f.n))});
+  });
+  if(!cands.length) return null;
+  cands.sort(function(a, b){ return a.d - b.d || a.rank - b.rank || b.pre - a.pre; });
+  var top = cands[0], next = cands[1];
+  if(next && next.d === top.d && next.rank === top.rank && next.pre === top.pre) return null;
+  return top.f;
 }
 function survivors(guesses, ans){
   return FLAVOURS.filter(function(c){
@@ -1083,16 +1584,60 @@ var DB = loadDB();
 if(!DB.games) DB.games = {};
 if(!DB.stats) DB.stats = {played:0, won:0, streak:0, best:0};
 if(DB.stats.best === undefined) DB.stats.best = DB.stats.streak || 0;
+/* Older saves predate streak dating. Treat their streak as current rather than
+   punishing anyone for an upgrade they had no part in. */
+if(DB.stats.lastDay === undefined && DB.stats.streak) DB.stats.lastDay = TODAY;
+
+var FIRST_VISIT = !Object.keys(DB.games).length;
 
 var activeDay, answer, game;
-function blankGame(){ return {guesses:[], phase:"play", points:0, bucket:null, outcome:null}; }
+/* ans is stamped onto a round the moment it is started and never recomputed.
+   The daily flavour is chosen by counting days into the answer pool, so adding
+   or removing an answerable flavour shifts every future day. Without this,
+   somebody's saved history would silently relabel itself after an update. */
+function blankGame(){ return {guesses:[], phase:"play", points:0, bucket:null, outcome:null, ans:null}; }
+
+/* A streak only survives if the last round you finished was today or yesterday.
+   Skipping days breaks it, which is what everyone assumes a streak means. */
+function currentStreak(){
+  var s = DB.stats;
+  if(!s.streak || s.lastDay === undefined) return 0;
+  return (s.lastDay === TODAY || s.lastDay === TODAY - 1) ? s.streak : 0;
+}
+
+/* ---------------- theme ---------------- */
+var THEMES = ["auto", "light", "dark"];
+var TKEY = "dailyscoop.theme";
+var themeBtn = document.getElementById("themeBtn");
+var themeDot = document.getElementById("themeDot");
+var themeName = document.getElementById("themeName");
+var theme = "auto";
+try{ theme = localStorage.getItem(TKEY) || "auto"; }catch(e){}
+if(THEMES.indexOf(theme) === -1) theme = "auto";
+
+function applyTheme(t){
+  if(t === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
+  themeDot.className = t;
+  themeName.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+  themeBtn.setAttribute("title", "Colour theme: " + themeName.textContent);
+  try{ localStorage.setItem(TKEY, t); }catch(e){}
+}
+applyTheme(theme);
+themeBtn.addEventListener("click", function(){
+  theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+  applyTheme(theme);
+});
 
 (function buildHelp(){
   var demo = document.getElementById("demoGrid");
-  cmp(byName("Vanilla"), byName("Strawberry")).forEach(function(c){
+  cmp(byName("Vanilla"), byName("Strawberry")).forEach(function(c, j){
     var d = document.createElement("div");
     d.className = "cell " + c.s;
-    d.textContent = c.t;
+    var b = document.createElement("b");
+    b.className = "clab"; b.textContent = COLUMNS[j].label;
+    d.appendChild(b);
+    d.appendChild(document.createTextNode(c.t));
     demo.appendChild(d);
   });
 
@@ -1122,8 +1667,56 @@ function blankGame(){ return {guesses:[], phase:"play", points:0, bucket:null, o
 var rowsEl = document.getElementById("rows");
 var ticketEl = document.getElementById("ticket");
 
-function render(){
+/* The counter is the thing this game actually measures, so watching it fall is
+   worth more than seeing it change. Counts down rather than jumping, and skips
+   the whole business for anyone who has asked for less motion. */
+var countEl = document.getElementById("remainCount");
+var lastCount = null, countRAF = null, countTimer = null;
+var STILL = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function settleCount(n){
+  if(countRAF){ cancelAnimationFrame(countRAF); countRAF = null; }
+  if(countTimer){ clearTimeout(countTimer); countTimer = null; }
+  countEl.textContent = n;
+  countEl.classList.remove("ticking");
+}
+
+function setCount(n){
+  settleCount(lastCount === null ? n : lastCount);
+  /* Animation frames stop in a hidden tab, so a count left mid-tick would sit
+     there showing the wrong number. Skip the animation when nothing can be
+     seen, and back it with a timer that lands the final value regardless. */
+  if(lastCount === null || lastCount === n || STILL || document.hidden){
+    settleCount(n); lastCount = n; return;
+  }
+  var from = lastCount, start = null, dur = 560;
+  lastCount = n;
+  countEl.classList.add("ticking");
+  countRAF = requestAnimationFrame(function step(ts){
+    if(start === null) start = ts;
+    var t = Math.min(1, (ts - start) / dur);
+    countEl.textContent = Math.round(from + (n - from) * (1 - Math.pow(1 - t, 3)));
+    if(t < 1) countRAF = requestAnimationFrame(step);
+    else settleCount(n);
+  });
+  countTimer = setTimeout(function(){ settleCount(n); }, dur + 250);
+}
+
+/* Narrow screens drop the header row and wrap six cells into two rows of three,
+   so every cell carries its own column name. Hidden above the breakpoint. */
+function colLabel(j){
+  var b = document.createElement("b");
+  b.className = "clab";
+  b.textContent = COLUMNS[j].label;
+  return b;
+}
+
+/* Only the row that was just played animates. Rebuilding the board re-runs the
+   drop on every earlier row otherwise, so the whole history blinks out and back
+   each time you guess. */
+function render(animateLast){
   rowsEl.innerHTML = "";
+  var newest = animateLast ? game.guesses.length - 1 : -1;
   game.guesses.forEach(function(name, i){
     var labelRow = document.createElement("div");
     labelRow.className = "row";
@@ -1139,8 +1732,9 @@ function render(){
     row.className = "row";
     cmp(byName(name), answer).forEach(function(c, j){
       var d = document.createElement("div");
-      d.className = "cell reveal " + c.s;
-      d.style.animationDelay = (j * 0.06) + "s";
+      d.className = "cell " + c.s + (i === newest ? " reveal" : "");
+      if(i === newest) d.style.animationDelay = (j * 0.06) + "s";
+      d.appendChild(colLabel(j));
       d.appendChild(document.createTextNode(c.t));
       if(c.s === "near"){
         var m = document.createElement("span");
@@ -1156,15 +1750,45 @@ function render(){
     var r = document.createElement("div"); r.className = "row";
     for(var k = 0; k < 6; k++){
       var e = document.createElement("div"); e.className = "cell empty";
+      e.appendChild(colLabel(k));
       r.appendChild(e);
     }
     rowsEl.appendChild(r);
   }
 
+  /* Only offered once a round is under way, so nobody can give up on a board
+     they have not looked at. */
+  document.getElementById("entryFoot").hidden =
+    !(game.phase === "play" && game.guesses.length > 0);
+
+  /* Any column that has come back green is settled, so show it rather than
+     making the player scan back up the board for it. */
+  var knownEl = document.getElementById("known");
+  var locked = [null, null, null, null, null, null];
+  game.guesses.forEach(function(n){
+    cmp(byName(n), answer).forEach(function(c, j){ if(c.s === "hit") locked[j] = c.t; });
+  });
+  var anyLocked = locked.some(function(v){ return v !== null; });
+  knownEl.innerHTML = "";
+  knownEl.hidden = !(anyLocked && game.phase === "play");
+  if(!knownEl.hidden){
+    var lead = document.createElement("span");
+    lead.className = "lead"; lead.textContent = "Known";
+    knownEl.appendChild(lead);
+    locked.forEach(function(v, j){
+      if(v === null) return;
+      var s = document.createElement("span");
+      s.className = "kv";
+      var e = document.createElement("em"); e.textContent = COLUMNS[j].label;
+      s.appendChild(e); s.appendChild(document.createTextNode(v));
+      knownEl.appendChild(s);
+    });
+  }
+
   if(game.phase === "play"){
     var left = game.guesses.length ? survivors(game.guesses, answer).length : ANSWER_ORDER.length;
     ticketEl.hidden = false;
-    document.getElementById("remainCount").textContent = left;
+    setCount(left);
     document.getElementById("remainWord").textContent =
       (left === 1 ? "flavour still fits" : "flavours still fit");
   } else {
@@ -1183,8 +1807,20 @@ var active = -1, matches = [];
    Elimination never removes anything from it, and flavours you have already
    guessed stay visible but greyed, so the book reads the same size all game. */
 function openMenu(){
-  var q = input.value.trim().toLowerCase();
-  matches = FLAVOURS.filter(function(f){ return f.n.toLowerCase().indexOf(q) > -1; });
+  /* Every typed word has to appear somewhere in the name, rather than the whole
+     string having to appear as one run, so "choc chip" finds both of them. */
+  var q = norm(input.value);
+  var terms = q.split(" ").filter(Boolean);
+  matches = FLAVOURS.filter(function(f){
+    var name = norm(f.n);
+    return terms.every(function(t){ return name.indexOf(t) > -1; });
+  });
+  /* Names that begin with what was typed come first, then names where a later
+     word begins with it, then everything else, alphabetical inside each band.
+     With an empty box that collapses to plain alphabetical order. */
+  matches.sort(function(a, b){
+    return matchRank(norm(a.n), q) - matchRank(norm(b.n), q) || a.n.localeCompare(b.n);
+  });
   menuList.innerHTML = "";
   matches.forEach(function(f, i){
     var used = game.guesses.indexOf(f.n) > -1;
@@ -1206,13 +1842,38 @@ function openMenu(){
 function pick(n){
   input.value = n; menu.hidden = true;
   input.setAttribute("aria-expanded", "false");
-  active = -1; syncBtn(); guessBtn.focus();
+  active = -1; syncBtn(); syncHint(); guessBtn.focus();
 }
+var entryHint = document.getElementById("entryHint");
+
+function matchRank(name, q){
+  if(!q) return 0;
+  if(name.indexOf(q) === 0) return 0;
+  if((" " + name).indexOf(" " + q) > -1) return 1;
+  return 2;
+}
+
 function syncBtn(){
-  var v = input.value.trim();
-  guessBtn.disabled = !byName(v) || game.guesses.indexOf(v) > -1;
+  var f = resolve(input.value);
+  guessBtn.disabled = !f || game.guesses.indexOf(f.n) > -1;
 }
-input.addEventListener("input", function(){ active = -1; openMenu(); syncBtn(); });
+
+/* If we had to interpret what was typed, say so before they commit to it,
+   so a correction never arrives as a surprise on the board. */
+function syncHint(){
+  var raw = input.value.trim();
+  var f = raw ? resolve(raw) : null;
+  if(f && norm(raw) !== norm(f.n) && game.guesses.indexOf(f.n) === -1){
+    entryHint.innerHTML = "";
+    entryHint.appendChild(document.createTextNode("Reading that as "));
+    var b = document.createElement("b"); b.textContent = f.n;
+    entryHint.appendChild(b);
+    entryHint.hidden = false;
+  } else {
+    entryHint.hidden = true;
+  }
+}
+input.addEventListener("input", function(){ active = -1; openMenu(); syncBtn(); syncHint(); });
 input.addEventListener("focus", openMenu);
 input.addEventListener("blur", function(){
   setTimeout(function(){ menu.hidden = true; input.setAttribute("aria-expanded","false"); }, 130);
@@ -1236,23 +1897,27 @@ input.addEventListener("keydown", function(e){
   } else if(e.key === "Enter"){
     e.preventDefault();
     if(active > -1 && matches[active]) pick(matches[active].n);
-    else if(byName(input.value.trim())) submit();
+    else if(resolve(input.value)) submit();
   } else if(e.key === "Escape"){ menu.hidden = true; }
 });
 guessBtn.addEventListener("click", submit);
 
 function submit(){
-  var name = input.value.trim();
-  if(!byName(name) || game.guesses.indexOf(name) > -1) return;
+  var f = resolve(input.value);
+  if(!f || game.guesses.indexOf(f.n) > -1) return;
+  var name = f.n;
+  if(!game.ans) game.ans = answer.n;
   game.guesses.push(name);
   input.value = ""; guessBtn.disabled = true; menu.hidden = true;
+  entryHint.hidden = true;
 
   if(name === answer.n){
     finish("won", SCORE[game.guesses.length - 1], String(game.guesses.length));
   } else if(game.guesses.length >= MAX){
-    game.phase = "lick"; saveDB(); render(); showLick();
+    game.phase = "lick"; saveDB(); render(true); showLick();
   } else {
-    saveDB(); render();
+    saveDB(); render(true);
+    input.focus();
   }
 }
 
@@ -1320,8 +1985,9 @@ function finish(outcome, pts, bucket){
   DB.stats.played = (DB.stats.played || 0) + 1;
   if(outcome === "won" || outcome === "licked") DB.stats.won = (DB.stats.won || 0) + 1;
   if(activeDay === TODAY){
-    if(outcome === "lost") DB.stats.streak = 0;
-    else DB.stats.streak = (DB.stats.streak || 0) + 1;
+    var kept = (outcome === "won" || outcome === "licked");
+    DB.stats.streak = kept ? currentStreak() + 1 : 0;
+    DB.stats.lastDay = TODAY;
     if(DB.stats.streak > (DB.stats.best || 0)) DB.stats.best = DB.stats.streak;
   }
   saveDB(); render(); showResult(); buildArchive();
@@ -1340,8 +2006,23 @@ function showResult(){
   document.getElementById("result").hidden = false;
 
   document.getElementById("verdict").textContent =
-    {won:"Got it.", licked:"Saved on the last lick.", lost:"Not this time."}[game.outcome];
+    {won:"Got it.", licked:"Saved on the last lick.",
+     lost:"Not this time.", gave:"Here it is."}[game.outcome];
   document.getElementById("answerName").textContent = answer.n;
+
+  /* The answer's own row, so the round ends on the six values rather than on a
+     name you then have to go and look up. */
+  var ar = document.getElementById("answerRow");
+  ar.innerHTML = "";
+  COLUMNS.forEach(function(c, j){
+    var d = document.createElement("div");
+    d.className = "cell hit reveal";
+    d.style.animationDelay = (j * 0.07) + "s";
+    d.appendChild(colLabel(j));
+    d.appendChild(document.createTextNode(answer[c.key]));
+    ar.appendChild(d);
+  });
+
   document.getElementById("points").textContent = game.points;
 
   box(document.getElementById("factWhat"), "What it is", answer.what,
@@ -1368,9 +2049,10 @@ function showStats(){
 
   var mine = document.getElementById("mine");
   mine.innerHTML = "";
-  [[days.length, "Rounds"], [winPct + "%", "Solved"], [s.streak || 0, "Streak"],
-   [s.best || 0, "Best"], [totalPts, "Points"], [avg, "Average"]].forEach(function(p){
+  [[currentStreak(), "Streak", true], [s.best || 0, "Best streak"], [winPct + "%", "Solved"],
+   [days.length, "Rounds"], [totalPts, "Points"], [avg, "Average"]].forEach(function(p){
     var d = document.createElement("div");
+    if(p[2]) d.className = "lead";
     var st = document.createElement("strong"); st.textContent = p[0];
     var sp = document.createElement("span"); sp.textContent = p[1];
     d.appendChild(st); d.appendChild(sp); mine.appendChild(d);
@@ -1391,10 +2073,10 @@ function showStats(){
     row.className = "hrow";
 
     var num = document.createElement("span");
-    num.className = "num"; num.textContent = "No. " + (d + 1);
+    num.className = "num"; num.textContent = fmtShort(d);
 
     var nm = document.createElement("span");
-    nm.className = "nm"; nm.textContent = answerFor(d).n;
+    nm.className = "nm"; nm.textContent = g.ans || answerFor(d).n;
 
     var rs = document.createElement("span");
     if(g.outcome === "won"){
@@ -1402,6 +2084,7 @@ function showStats(){
       rs.textContent = g.bucket + (g.bucket === "1" ? " guess" : " guesses");
     }
     else if(g.outcome === "licked"){ rs.className = "rs save"; rs.textContent = "Last lick"; }
+    else if(g.outcome === "gave"){ rs.className = "rs gone"; rs.textContent = "Gave up"; }
     else { rs.className = "rs gone"; rs.textContent = "Missed"; }
 
     var pt = document.createElement("span");
@@ -1412,51 +2095,71 @@ function showStats(){
   });
 }
 
+/* Five weeks of real dates, Monday first, ending on the week containing today.
+   Days outside the archive window or still in the future are shown but dead, so
+   the grid keeps its shape instead of starting mid-row. */
 function buildArchive(){
   var grid = document.getElementById("archgrid");
   grid.innerHTML = "";
-  for(var d = TODAY; d > TODAY - ARCHIVE_DAYS; d--){
+
+  ["M","T","W","T","F","S","S"].forEach(function(w){
+    var h = document.createElement("span");
+    h.className = "dow"; h.textContent = w;
+    grid.appendChild(h);
+  });
+
+  var dow = (dateFor(TODAY).getUTCDay() + 6) % 7;
+  var start = TODAY - dow - 28;
+  var oldest = TODAY - ARCHIVE_DAYS + 1;
+
+  for(var i = 0; i < 35; i++){
     (function(day){
-      var g = DB.games[day];
       var b = document.createElement("button");
       b.type = "button";
-      var cls = [];
+      b.textContent = dateFor(day).getUTCDate();
+      b.title = fmtLong(day);
+
+      if(day > TODAY || day < oldest){
+        b.disabled = true;
+        grid.appendChild(b);
+        return;
+      }
+
+      var g = DB.games[day], cls = [];
       if(day === TODAY) cls.push("today");
       if(day === activeDay) cls.push("here");
-      var status = "Not played";
       if(g && g.phase === "done"){
-        if(g.outcome === "won"){ status = g.bucket + "/" + MAX; cls.push("done"); }
-        else if(g.outcome === "licked"){ status = "Saved"; cls.push("done"); }
-        else { status = "Missed"; }
+        if(g.outcome === "won") cls.push("solved");
+        else if(g.outcome === "licked") cls.push("saved");
+        else cls.push("missed");
       } else if(g && g.guesses.length){
-        status = "In progress";
+        cls.push("started");
       }
       b.className = cls.join(" ");
-      var t = document.createElement("strong");
-      t.textContent = day === TODAY ? "Today" : ("No. " + (day + 1));
-      var e = document.createElement("em"); e.textContent = status;
-      b.appendChild(t); b.appendChild(e);
       b.addEventListener("click", function(){ loadDay(day); });
       grid.appendChild(b);
-    })(d);
+    })(start + i);
   }
+
+  document.getElementById("archCap").textContent =
+    fmtDate(start, {month:"long"}) + " to " + fmtDate(TODAY, {month:"long", year:"numeric"});
 }
 
 function loadDay(day){
   activeDay = day;
-  answer = answerFor(day);
   if(!DB.games[day]) DB.games[day] = blankGame();
   game = DB.games[day];
+  answer = (game.ans && byName(game.ans)) || answerFor(day);
 
   document.getElementById("eyebrow").innerHTML =
-    "Flavour No.&nbsp;<b>" + (day + 1) + "</b> &middot; six guesses" +
-    (day === TODAY ? "" : " &middot; from the archive");
+    (day === TODAY ? "Today" : fmtShort(day)) +
+    " &middot; No.&nbsp;<b>" + (day + 1) + "</b> &middot; six guesses";
 
   var bar = document.getElementById("archbar");
   bar.hidden = (day === TODAY);
   if(day !== TODAY){
     document.getElementById("archbarText").textContent =
-      "You are playing flavour no. " + (day + 1) + ", which is one of the older ones.";
+      "You are playing " + fmtLong(day) + ", from the archive.";
   }
 
   document.getElementById("result").hidden = true;
@@ -1465,6 +2168,9 @@ function loadDay(day){
   document.getElementById("entryPanel").hidden = false;
   input.value = ""; guessBtn.disabled = true; menu.hidden = true; active = -1;
 
+  /* Switching days should show the new count outright rather than counting
+     down to it from whatever the previous day happened to be sitting on. */
+  lastCount = null;
   render();
   buildArchive();
   if(game.phase === "done") showResult();
@@ -1474,30 +2180,86 @@ function loadDay(day){
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
+document.getElementById("giveUpBtn").addEventListener("click", function(){
+  if(game.phase !== "play" || !game.guesses.length) return;
+  if(!window.confirm("Give up and see the answer? This round will score nothing.")) return;
+  if(!game.ans) game.ans = answer.n;
+  finish("gave", 0, "gave");
+});
+
 document.getElementById("backToday").addEventListener("click", function(){ loadDay(TODAY); });
 
-document.getElementById("shareBtn").addEventListener("click", function(){
-  var glyph = {hit:"🟩", near:"🟨", miss:"⬜"};
-  var lines = game.guesses.map(function(n){
-    return cmp(byName(n), answer).map(function(c){ return glyph[c.s]; }).join("");
-  });
-  var head = "The Daily Scoop No. " + (activeDay + 1) + "\n";
-  if(game.outcome === "won"){
-    head += game.guesses.length + "/" + MAX + " · " + game.points + " pts\n";
+/* Filled, half and empty circles instead of coloured squares. They read as a
+   pattern rather than as noise, they carry the meaning in shape rather than
+   colour so they survive being colourblind, and they sit properly in a line of
+   text. The line underneath is the real brag, because how far you cut the field
+   is the thing this game measures that nothing else does. */
+function firstSentence(t){
+  if(!t) return "";
+  var m = String(t).match(/^[^.!?]*[.!?]/);
+  return (m ? m[0] : t).trim();
+}
+
+/* The share names the flavour and carries a fact about it. That is a spoiler by
+   design: it is aimed at someone who has not played, and a fact is a far better
+   reason to click through than a row of numbers was. */
+function shareText(){
+  var used = game.guesses.length;
+  var dot = " · ";
+  var lines = ["The Daily Scoop · " + fmtDate(activeDay, {day:"numeric", month:"long"})];
+
+  if(game.outcome === "won" && used === 1){
+    lines.push("Got it on the first guess" + dot + game.points + " points");
+  } else if(game.outcome === "won"){
+    lines.push("Solved in " + used + dot + game.points + " points");
   } else if(game.outcome === "licked"){
-    head += "🍦 saved on the last lick · " + game.points + " pt\n";
+    lines.push("Saved on the last lick" + dot + game.points +
+               (game.points === 1 ? " point" : " points"));
+  } else if(game.outcome === "gave"){
+    lines.push("Gave up" + dot + "0 points");
   } else {
-    head += "X/" + MAX + " · 0 pts\n";
+    lines.push("Missed it" + dot + "0 points");
   }
-  var text = head + lines.join("\n");
+
+  var spark = answer.spark || firstSentence(answer.trivia);
+  if(spark){
+    lines.push("", "The flavour was " + answer.n + ". " + spark);
+  }
+  lines.push("", SITE);
+  return lines.join("\n");
+}
+
+var shareBtn = document.getElementById("shareBtn");
+var canShare = !!(navigator.share);
+shareBtn.textContent = canShare ? "Share result" : "Copy result";
+
+shareBtn.addEventListener("click", function(){
+  var text = shareText();
   var btn = this;
-  function done(){
-    btn.textContent = "Copied";
-    setTimeout(function(){ btn.textContent = "Copy result"; }, 1600);
+  var idle = canShare ? "Share result" : "Copy result";
+  function flash(word){
+    btn.textContent = word;
+    setTimeout(function(){ btn.textContent = idle; }, 1600);
   }
+  /* Copy first and always, inside the click, because the clipboard is only
+     reliably writable during a user gesture. The share sheet then opens on top
+     of that, so backing out of it still leaves the result on the clipboard. */
+  var copied = false;
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done, function(){ window.prompt("Copy your result:", text); });
-  } else { window.prompt("Copy your result:", text); }
+    try{
+      navigator.clipboard.writeText(text).then(function(){ copied = true; }, function(){});
+      copied = true;
+    }catch(e){}
+  }
+
+  if(canShare){
+    flash(copied ? "Copied" : "Shared");
+    navigator.share({text: text}).catch(function(){});
+  } else if(copied){
+    flash("Copied");
+  } else {
+    window.prompt("Copy your result:", text);
+  }
 });
 
 document.getElementById("resetBtn").addEventListener("click", function(){
@@ -1506,12 +2268,64 @@ document.getElementById("resetBtn").addEventListener("click", function(){
   window.location.reload();
 });
 
+/* Somebody arriving cold sees an empty grid and a text box, which is not
+   obviously a game, so open the rules for them and leave them shut afterwards. */
+if(FIRST_VISIT) document.getElementById("howto").open = true;
+
+/* ---------------- flavour suggestions ----------------
+   Paste a form endpoint between the quotes to switch this on. Formspree,
+   Formspark and Basin all take a plain JSON POST and need nothing else, and a
+   Google Form works too if you would rather not sign up for anything. Left
+   empty the form stays visible but tells you it has nowhere to send. */
+var SUGGEST_ENDPOINT = "https://formspree.io/f/xkjnplvw";
+
+(function(){
+  var form = document.getElementById("sgForm");
+  var msg = document.getElementById("sgMsg");
+  var btn = document.getElementById("sgBtn");
+
+  function say(text, cls){
+    msg.textContent = text;
+    msg.className = "sg-msg" + (cls ? " " + cls : "");
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("sgName").value.trim();
+    var note = document.getElementById("sgNote").value.trim();
+
+    /* Anything that fills the offscreen field is a bot. Thank it and drop it. */
+    if(document.getElementById("sgTrap").value){ say("Thanks, noted.", "ok"); return; }
+    if(!name){ say("Give it a name first.", "bad"); return; }
+    if(byName(name)){ say(byName(name).n + " is already in the book.", "bad"); return; }
+
+    if(!SUGGEST_ENDPOINT){
+      say("Not wired up yet. Set SUGGEST_ENDPOINT in the page source.", "bad");
+      return;
+    }
+
+    btn.disabled = true;
+    say("Sending…");
+    fetch(SUGGEST_ENDPOINT, {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: JSON.stringify({
+        flavour: name,
+        note: note,
+        day: activeDay + 1,
+        _subject: "Flavour suggestion: " + name
+      })
+    }).then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      form.reset();
+      say("Thanks. That has gone through.", "ok");
+    }).catch(function(){
+      say("That did not send. Try again in a moment.", "bad");
+    }).then(function(){ btn.disabled = false; });
+  });
+})();
+
 loadDay(TODAY);
 </script>
-
-<!-- Cloudflare Web Analytics -->
-<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "2dc0628e84e64bcda28f3caaef6fcc1a"}'></script>
-<!-- End Cloudflare Web Analytics -->
-
 </body>
 </html>
