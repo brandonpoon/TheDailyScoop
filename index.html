@@ -3,8 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Daily Scoop</title>
+<title>The Daily Scoop, a daily ice cream flavour guessing game</title>
 <meta name="description" content="A new ice cream flavour to guess every day. Six clues, six guesses, and 460 flavours to choose from.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "The Daily Scoop",
+  "url": "https://dailyscoop.site/",
+  "description": "A daily ice cream flavour guessing game. Six clues, six guesses, and 460 flavours to choose from.",
+  "applicationCategory": "GameApplication",
+  "genre": "Puzzle",
+  "operatingSystem": "Any modern web browser",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en",
+  "image": "https://dailyscoop.site/og.png",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
 <link rel="canonical" href="https://dailyscoop.site/">
 <meta name="theme-color" content="#E9F2EC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#211A19" media="(prefers-color-scheme: dark)">
@@ -147,9 +163,11 @@ h1{
   font-weight:800;font-size:var(--step-4);line-height:.98;
   letter-spacing:-.028em;margin:0;text-wrap:balance;
 }
+.tagline{text-align:center;color:var(--ink-soft);font-size:var(--step-0);margin:6px 0 4px;}
 .eyebrow{
   text-align:center;font-size:var(--step--1);letter-spacing:.13em;
   text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin:0 0 22px;
+  opacity:.85;
 }
 .eyebrow b{color:var(--strawberry);font-weight:700;}
 
@@ -513,6 +531,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     </svg>
     <h1>The Daily Scoop</h1>
   </header>
+  <p class="tagline">Guess the ice cream flavour of the day from six clues.</p>
   <p class="eyebrow" id="eyebrow"></p>
 
   <div class="stack">
@@ -526,7 +545,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
       <details id="howto">
         <summary><span class="badge">?</span> How to play</summary>
         <div class="help-body">
-          <p>Guess a flavour and the six columns will tell you how close you were.</p>
+          <p>Guess the ice cream flavour of the day, and the six columns will tell you how close you were.</p>
           <div class="legend">
             <span class="key k-hit"><i></i>Matched exactly</span>
             <span class="key k-near"><i></i>Close to it</span>
@@ -611,7 +630,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
       <details id="arch">
         <summary><span class="badge">&#8634;</span> Archive</summary>
         <div class="help-body">
-          <p>The last thirty days are all still here. Anything you left unfinished is waiting where you left it, and rounds you play from the archive count towards your record but will not extend your streak.</p>
+          <p>Every ice cream from the last thirty days is still here. Anything you left unfinished is waiting where you left it, and rounds you play from the archive count towards your record but will not extend your streak.</p>
           <p class="arch-cap" id="archCap"></p>
           <div class="cal" id="archgrid"></div>
           <div class="legend" style="margin-top:14px">
@@ -629,7 +648,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     <details id="cols">
       <summary><span class="badge">i</span> How it works</summary>
       <div class="help-body">
-        <p>Four of the six columns are things you can answer just from having eaten the flavour, and the other two are about where it came from. Here is what each one is actually asking.</p>
+        <p>Four of the six columns are things you can answer just from having eaten the ice cream, and the other two are about where it came from. Here is what each one is actually asking.</p>
 
         <div class="demo">
           <p class="demo-cap">Say you guess Vanilla and the answer turns out to be Strawberry</p>
@@ -645,7 +664,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
 
         <p><b>Scoring</b> runs 15, 12, 9, 7, 5 and 3 depending on which guess you got there on. The last lick is worth a single point, and missing altogether is worth nothing.</p>
 
-        <p><b>The flavour of the day</b> is drawn from a fixed shuffled order by counting the days, so everyone playing on the same day gets the same one and it turns over at your local midnight. Nothing comes round again inside a month.</p>
+        <p><b>The ice cream of the day</b> is drawn from a fixed shuffled order by counting the days, so everyone playing this puzzle on the same day gets the same one, and it turns over at your local midnight. Nothing comes round again inside a month.</p>
       </div>
     </details>
   </section>
@@ -654,7 +673,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     <details id="suggest">
       <summary><span class="badge">+</span> Suggest a flavour</summary>
       <div class="help-body">
-        <p>Something obvious missing? Send it over and it will go in the book.</p>
+        <p>An obvious ice cream flavour missing from the game? Send it over and it will go in the book.</p>
         <form id="sgForm" novalidate>
           <input type="text" id="sgName" placeholder="Flavour name" maxlength="60" autocomplete="off">
           <textarea id="sgNote" rows="3" maxlength="400" placeholder="Anything worth knowing about it, if you like"></textarea>
@@ -669,7 +688,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
   </section>
 
   <footer>
-    A new flavour every day at midnight.<br>
+    A new ice cream flavour to guess every day at midnight.<br>
     <span id="rosterNote"></span>
   </footer>
 </div>
