@@ -57,8 +57,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Rubik:wght@400;500;600;700&display=swap">
 <style>
+/* ---------------------------------------------------------------------------
+   The Daily Scoop, parlour signage.
+
+   Same bones as before. The three changes worth naming are that the masthead is
+   now a hanging shop sign rather than a heading, that every raised thing casts
+   the same hard offset shadow so the page reads as printed card rather than as
+   glass, and that the six board cells are set in the display face so the answer
+   values carry the same voice as the title above them.
+--------------------------------------------------------------------------- */
 :root{
+  /* The original palette, restored. The ground is a cool mint that leans very
+     slightly blue, and that coolness is what the cream surfaces sit against.
+     An earlier pass here warmed the ground towards yellow, which quietly turned
+     the whole page amber and left the cream with nothing to contrast with.
+     Only three tokens are additions, and all three exist to serve the raised
+     edges and the wash of light that this layout needs. */
   --ground:#E9F2EC;
+  --ground-2:#F4FAF5;
   --surface:#FFFCF6;
   --surface-2:#F5EFE3;
   --ink:#3E2F2A;
@@ -66,6 +82,7 @@
   --line:#DCD2C2;
   --line-soft:#E9E0D0;
   --strawberry:#D9647A;
+  --strawberry-deep:#C24A63;
   --strawberry-soft:#F4D6DB;
   --butterscotch:#E8B45F;
   --pistachio:#5C7C4C;
@@ -75,123 +92,151 @@
   --miss-bg:#D2C7B3;  --miss-fg:#4E4134;
 
   --shadow:rgba(62,47,42,.20);
+  --shadow-hard:rgba(62,47,42,.28);
   --awning-shadow:rgba(62,47,42,.22);
   --hatch:rgba(62,47,42,.05);
   --focus:#C24A63;
 
-  --step--2:.7rem;
-  --step--1:.78rem;
+  --step--2:.71rem;
+  --step--1:.79rem;
   --step-0:.95rem;
-  --step-1:1.12rem;
-  --step-2:1.45rem;
-  --step-3:2rem;
-  --step-4:2.9rem;
+  --step-1:1.14rem;
+  --step-2:1.5rem;
+  --step-3:2.05rem;
+  --step-4:3rem;
 
   --sans:"Rubik","Segoe UI",system-ui,sans-serif;
   --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --ground:#211A19; --surface:#2C2322; --surface-2:#372B29;
+    --ground:#211A19; --ground-2:#2B2422; --surface:#2C2322; --surface-2:#372B29;
     --ink:#F2E8DF; --ink-soft:#B3A093; --line:#4A3B37; --line-soft:#3D302D;
-    --strawberry:#EE8C9E; --strawberry-soft:#4C2F35;
+    --strawberry:#EE8C9E; --strawberry-deep:#C05F72; --strawberry-soft:#4C2F35;
     --butterscotch:#E2AC5C; --pistachio:#8FB57A;
     --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
     --near-bg:#C8933F; --near-fg:#241906;
     --miss-bg:#4E403C; --miss-fg:#C6B6A9;
-    --shadow:rgba(0,0,0,.45); --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+    --shadow:rgba(0,0,0,.45); --shadow-hard:rgba(0,0,0,.55);
+    --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
   }
 }
 :root[data-theme="dark"]{
-  --ground:#211A19; --surface:#2C2322; --surface-2:#372B29;
+  --ground:#211A19; --ground-2:#2B2422; --surface:#2C2322; --surface-2:#372B29;
   --ink:#F2E8DF; --ink-soft:#B3A093; --line:#4A3B37; --line-soft:#3D302D;
-  --strawberry:#EE8C9E; --strawberry-soft:#4C2F35;
+  --strawberry:#EE8C9E; --strawberry-deep:#C05F72; --strawberry-soft:#4C2F35;
   --butterscotch:#E2AC5C; --pistachio:#8FB57A;
   --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
   --near-bg:#C8933F; --near-fg:#241906;
   --miss-bg:#4E403C; --miss-fg:#C6B6A9;
-  --shadow:rgba(0,0,0,.45); --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+  --shadow:rgba(0,0,0,.45); --shadow-hard:rgba(0,0,0,.55);
+  --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
 }
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
+/* A wash of light falling from the awning, with the old crosshatch kept
+   underneath it at about half strength so the ground still has a weave. */
 body{
   background-color:var(--ground);
   background-image:
-    repeating-linear-gradient(45deg, var(--hatch) 0 1px, transparent 1px 16px),
-    repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 16px);
+    repeating-linear-gradient(45deg, var(--hatch) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 18px),
+    radial-gradient(1100px 460px at 50% -160px, var(--ground-2), transparent 72%);
+  background-attachment:scroll, scroll, fixed;
   color:var(--ink); font-family:var(--sans); font-size:var(--step-0);
-  line-height:1.6; -webkit-font-smoothing:antialiased;
+  line-height:1.62; -webkit-font-smoothing:antialiased;
 }
-:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:5px;}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px;}
 
 /* The shadow has to sit on a wrapper. A filter on the awning itself would be
    applied before the mask and then clipped away with everything else. */
-.awning-wrap{filter:drop-shadow(0 4px 7px var(--awning-shadow));}
+.awning-wrap{filter:drop-shadow(0 5px 9px var(--awning-shadow));}
 .awning{
-  height:68px;
-  background:repeating-linear-gradient(90deg, var(--strawberry) 0 32px, var(--surface) 32px 64px);
+  height:76px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.26) 0, rgba(255,255,255,0) 38%,
+                    rgba(0,0,0,.07) 74%, rgba(0,0,0,.15) 100%),
+    repeating-linear-gradient(90deg, var(--strawberry) 0 34px, var(--surface) 34px 68px);
   -webkit-mask:
-    linear-gradient(#000 0 0) 0 0/100% calc(100% - 14px) no-repeat,
-    radial-gradient(circle 14px at 14px 0, #000 98%, transparent 100%) 0 100%/28px 14px repeat-x;
+    linear-gradient(#000 0 0) 0 0/100% calc(100% - 15px) no-repeat,
+    radial-gradient(circle 15px at 15px 0, #000 98%, transparent 100%) 0 100%/30px 15px repeat-x;
   mask:
-    linear-gradient(#000 0 0) 0 0/100% calc(100% - 14px) no-repeat,
-    radial-gradient(circle 14px at 14px 0, #000 98%, transparent 100%) 0 100%/28px 14px repeat-x;
+    linear-gradient(#000 0 0) 0 0/100% calc(100% - 15px) no-repeat,
+    radial-gradient(circle 15px at 15px 0, #000 98%, transparent 100%) 0 100%/30px 15px repeat-x;
 }
 
-.wrap{max-width:740px;margin:0 auto;padding:0 18px 72px;position:relative;}
-/* Lifted out of the flow so it stops pushing the masthead down the page. It
-   drops back into the flow on narrow screens, where it would otherwise sit on
-   top of the title. */
-.topbar{position:absolute;top:15px;right:18px;z-index:5;}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px 80px;position:relative;}
+/* Sits in the band between the awning and the sign, at every width. Floating it
+   over the corner of the sign put it a few pixels from collision on a mid sized
+   window, and a control that grazes the masthead reads as a mistake. */
+.topbar{display:flex;justify-content:flex-end;padding-top:14px;}
 .themebtn{
   background:var(--surface);border:1.5px solid var(--line);color:var(--ink-soft);
   border-radius:999px;padding:6px 14px 6px 11px;font-size:var(--step--1);font-weight:500;
-  display:inline-flex;align-items:center;gap:8px;
+  display:inline-flex;align-items:center;gap:8px;box-shadow:2px 2px 0 var(--shadow);
 }
-.themebtn:hover:not(:disabled){background:var(--surface-2);filter:none;transform:none;}
+.themebtn:hover:not(:disabled){background:var(--surface-2);filter:none;transform:none;
+  box-shadow:2px 2px 0 var(--shadow);}
+.themebtn:active:not(:disabled){transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow);}
 .themebtn i{width:11px;height:11px;border-radius:50%;display:block;flex:none;
   border:1.5px solid var(--ink-soft);}
 .themebtn i.light{background:var(--butterscotch);border-color:var(--butterscotch);}
 .themebtn i.dark{background:var(--ink-soft);}
 .themebtn i.auto{background:linear-gradient(90deg,var(--butterscotch) 50%,transparent 50%);}
-.masthead{display:flex;align-items:center;justify-content:center;gap:18px;padding:30px 0 4px;}
-.masthead svg{flex:none;width:68px;height:80px;}
+
+/* ------------------------------------------------------------ the shop sign */
+.signboard{
+  max-width:560px;margin:14px auto 28px;
+  background:var(--surface);
+  border:1.5px solid var(--line);
+  border-radius:22px;
+  box-shadow:4px 5px 0 var(--shadow-hard);
+  overflow:hidden;
+}
+.masthead{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 24px 18px;}
+.cone{flex:none;display:block;filter:drop-shadow(0 3px 4px var(--shadow));}
+.masthead svg{display:block;width:66px;height:78px;}
+.namebox{text-align:left;min-width:0;}
 h1{
   font-family:var(--display);
   font-variation-settings:"opsz" 96;
-  font-weight:800;font-size:var(--step-4);line-height:.98;
-  letter-spacing:-.028em;margin:0;text-wrap:balance;
+  font-weight:800;font-size:var(--step-4);line-height:.94;
+  letter-spacing:-.035em;margin:0;text-wrap:balance;
 }
-.tagline{text-align:center;color:var(--ink-soft);font-size:var(--step-0);margin:6px 0 4px;}
+.tagline{color:var(--ink-soft);font-size:var(--step--1);margin:7px 0 0;line-height:1.45;max-width:30ch;}
+/* The nameplate strip along the bottom of the sign. */
 .eyebrow{
+  margin:0;padding:10px 16px;
+  background:var(--strawberry-soft);
+  border-top:1.5px solid var(--line);
   text-align:center;font-size:var(--step--1);letter-spacing:.13em;
-  text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin:0 0 22px;
-  opacity:.85;
+  text-transform:uppercase;color:var(--ink);font-weight:600;
 }
-.eyebrow b{color:var(--strawberry);font-weight:700;}
+.eyebrow b{color:var(--strawberry-deep);font-weight:800;}
 
+/* ---------------------------------------------------------------- surfaces */
 .panel{
   background:var(--surface);border:1.5px solid var(--line);
-  border-radius:16px;box-shadow:3px 3px 0 var(--shadow);
+  border-radius:18px;box-shadow:4px 4px 0 var(--shadow);
 }
 .stack{display:flex;flex-direction:column;gap:18px;}
 
 .archbar{
   display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
   background:var(--strawberry-soft);border:1.5px solid var(--strawberry);
-  border-radius:14px;padding:11px 14px;
+  border-radius:15px;padding:11px 14px;box-shadow:3px 3px 0 var(--shadow);
 }
 .archbar span{font-size:var(--step--1);font-weight:500;color:var(--ink);}
 .archbar button{padding:8px 15px;font-size:var(--step--1);}
 
 .help{padding:2px 4px;}
-.deep{margin-top:44px;}
+.deep{margin-top:46px;}
 .nudge{margin-top:16px;}
 #sgForm{display:flex;flex-direction:column;gap:9px;max-width:52ch;}
 #sgForm input[type="text"], #sgForm textarea{
   font-family:var(--sans);font-size:var(--step-0);font-weight:400;
-  padding:11px 14px;border:1.5px solid var(--line);border-radius:11px;
+  padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;
   background:var(--surface-2);color:var(--ink);resize:vertical;
 }
 #sgForm .trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
@@ -199,28 +244,31 @@ h1{
 .sg-msg{font-size:var(--step--1);color:var(--ink-soft);}
 .sg-msg.ok{color:var(--pistachio);font-weight:500;}
 .sg-msg.bad{color:var(--strawberry);font-weight:500;}
+
 details{border-bottom:1.5px solid var(--line-soft);}
 details:last-child{border-bottom:none;}
 summary{
-  list-style:none;cursor:pointer;padding:14px 18px;
-  display:flex;align-items:center;gap:10px;
-  font-weight:600;font-size:var(--step-0);color:var(--ink);
+  list-style:none;cursor:pointer;padding:15px 18px;
+  display:flex;align-items:center;gap:11px;
+  font-family:var(--display);font-variation-settings:"opsz" 20;
+  font-weight:700;font-size:var(--step-1);letter-spacing:-.012em;color:var(--ink);
 }
 summary::-webkit-details-marker{display:none;}
 summary::after{
   content:"";margin-left:auto;flex:none;width:8px;height:8px;
-  border-right:2.2px solid var(--ink-soft);border-bottom:2.2px solid var(--ink-soft);
+  border-right:2.4px solid var(--ink-soft);border-bottom:2.4px solid var(--ink-soft);
   transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s ease;
 }
 details[open] summary::after{transform:rotate(-135deg) translate(-2px,-2px);}
-summary:hover{background:var(--surface-2);border-radius:10px;}
+summary:hover{background:var(--surface-2);border-radius:12px;}
 .badge{
-  font-family:var(--display);font-weight:700;font-size:var(--step--1);
-  background:var(--strawberry-soft);color:var(--strawberry);
-  border-radius:999px;padding:2px 10px;flex:none;
+  font-family:var(--display);font-weight:800;font-size:var(--step--1);
+  background:var(--strawberry-deep);color:#FFF8F9;
+  border-radius:999px;padding:2px 11px;flex:none;
+  box-shadow:0 2px 0 rgba(0,0,0,.18);
 }
-.help-body{padding:0 18px 20px;font-size:var(--step-0);line-height:1.68;}
-.help-body p{margin:0 0 13px;max-width:64ch;}
+.help-body{padding:0 18px 22px;font-size:var(--step-0);line-height:1.7;}
+.help-body p{margin:0 0 14px;max-width:64ch;}
 .help-body p:last-child{margin-bottom:0;}
 
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
@@ -229,25 +277,29 @@ summary:hover{background:var(--surface-2);border-radius:10px;}
   font-size:var(--step--1);font-weight:500;color:var(--ink-soft);
   background:var(--surface-2);border-radius:999px;padding:5px 13px 5px 6px;
 }
-.key i{width:15px;height:15px;border-radius:5px;flex:none;display:block;}
+.key i{width:16px;height:16px;border-radius:6px;flex:none;
+  display:flex;align-items:center;justify-content:center;}
 .key.k-hit i{background:var(--hit-bg);}
+.key.k-hit i::after{content:"\2713";color:var(--hit-fg);font-size:10px;
+  font-weight:700;line-height:1;}
 .key.k-near i{background:var(--near-bg);}
 .key.k-miss i{background:var(--miss-bg);}
 
-.demo{margin:6px 0 14px;}
+.demo{margin:6px 0 16px;}
 .demo-cap{
   font-size:var(--step--2);letter-spacing:.1em;text-transform:uppercase;
-  font-weight:600;color:var(--ink-soft);margin:0 0 8px;
+  font-weight:700;color:var(--ink-soft);margin:0 0 9px;
 }
 .demo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
-.demo-grid .cell{min-height:50px;font-size:var(--step--2);}
+.demo-grid .cell{min-height:54px;font-size:var(--step--2);}
 
-.glossary{display:flex;flex-direction:column;gap:13px;margin:6px 0 20px;}
-.gl{background:var(--surface-2);border-radius:12px;padding:14px 16px;border-left:4px solid var(--butterscotch);}
-.gl h3{margin:0 0 5px;font-family:var(--display);font-variation-settings:"opsz" 24;
-  font-weight:700;font-size:var(--step-1);letter-spacing:-.01em;}
-.gl p{margin:0 0 10px;font-size:var(--step--1);color:var(--ink-soft);line-height:1.65;max-width:60ch;}
-.gl .vals{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.glossary{display:flex;flex-direction:column;gap:13px;margin:6px 0 22px;}
+.gl{background:var(--surface-2);border-radius:14px;padding:15px 17px;
+  border-left:5px solid var(--butterscotch);}
+.gl h3{margin:0 0 6px;font-family:var(--display);font-variation-settings:"opsz" 24;
+  font-weight:700;font-size:var(--step-1);letter-spacing:-.015em;}
+.gl p{margin:0 0 11px;font-size:var(--step--1);color:var(--ink-soft);line-height:1.68;max-width:60ch;}
+.gl .vals{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
 .gl .vals span{
   font-size:var(--step--2);font-weight:500;
   background:var(--surface);border:1.5px solid var(--line);
@@ -255,137 +307,166 @@ summary:hover{background:var(--surface-2);border-radius:10px;}
 }
 .gl .vals span.sep{border:none;background:none;color:var(--ink-soft);padding:3px 2px;}
 .gl .eg{margin:0;font-size:var(--step--1);color:var(--ink);
-  border-top:1px dashed var(--line);padding-top:10px;}
-.gl .eg b{color:var(--strawberry);font-weight:600;}
+  border-top:1px dashed var(--line);padding-top:11px;}
+.gl .eg b{color:var(--strawberry);font-weight:700;}
 
-.arch-cap{font-size:var(--step--1);color:var(--ink-soft);text-align:center;margin:0 0 10px !important;}
+.arch-cap{font-size:var(--step--1);color:var(--ink-soft);text-align:center;margin:0 0 11px !important;}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:2px;}
 .cal .dow{
   text-align:center;font-size:var(--step--2);text-transform:uppercase;
-  letter-spacing:.06em;color:var(--ink-soft);font-weight:600;padding-bottom:3px;
+  letter-spacing:.06em;color:var(--ink-soft);font-weight:700;padding-bottom:4px;
 }
 .cal button{
-  aspect-ratio:1;padding:0;border-radius:10px;
+  aspect-ratio:1;padding:0;border-radius:11px;box-shadow:none;
   background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);
   display:flex;align-items:center;justify-content:center;
-  font-size:var(--step--1);font-weight:500;font-variant-numeric:tabular-nums;
+  font-size:var(--step--1);font-weight:600;font-variant-numeric:tabular-nums;
 }
-.cal button:hover:not(:disabled){background:var(--strawberry-soft);border-color:var(--strawberry);filter:none;transform:none;}
-.cal button:disabled{background:transparent;border-color:transparent;color:var(--ink-soft);opacity:.3;cursor:default;}
+.cal button:hover:not(:disabled){background:var(--strawberry-soft);border-color:var(--strawberry);
+  filter:none;transform:none;box-shadow:none;}
+.cal button:active:not(:disabled){transform:scale(.94);box-shadow:none;}
+.cal button:disabled{background:transparent;border-color:transparent;color:var(--ink-soft);
+  opacity:.28;cursor:default;box-shadow:none;}
 .cal button.solved{background:var(--hit-bg);border-color:var(--hit-bg);color:var(--hit-fg);}
 .cal button.saved{background:var(--near-bg);border-color:var(--near-bg);color:var(--near-fg);}
 .cal button.missed{background:var(--miss-bg);border-color:var(--miss-bg);color:var(--miss-fg);}
 .cal button.started{border-style:dashed;border-color:var(--strawberry);}
-.cal button.today{border-color:var(--strawberry);border-width:2.5px;font-weight:700;}
+.cal button.today{border-color:var(--strawberry);border-width:2.5px;font-weight:800;}
 .cal button.here{outline:2.5px solid var(--strawberry);outline-offset:2px;}
 
 /* What the board has already proved, so nobody has to hold six columns of
    bookkeeping in their head four guesses in. */
-.known{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:15px 16px 0;}
+.known{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:16px 16px 0;}
 .known .lead{
-  color:var(--ink-soft);font-size:var(--step--2);font-weight:600;
-  text-transform:uppercase;letter-spacing:.08em;padding-right:3px;
+  color:var(--ink-soft);font-size:var(--step--2);font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;padding-right:3px;
 }
 .known .kv{
   display:inline-flex;align-items:baseline;gap:7px;
   background:var(--hit-bg);color:var(--hit-fg);
   border-radius:999px;padding:5px 13px;margin:0;
-  font-size:var(--step--1);font-weight:500;line-height:1.4;
+  font-size:var(--step--1);font-weight:600;line-height:1.4;
+  box-shadow:0 2px 0 rgba(0,0,0,.16);
 }
 .known .kv em{
-  font-style:normal;opacity:.72;font-size:var(--step--2);
-  text-transform:uppercase;letter-spacing:.06em;
+  font-style:normal;opacity:.74;font-size:var(--step--2);
+  text-transform:uppercase;letter-spacing:.06em;font-weight:500;
 }
-.answer-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 18px;}
+.answer-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 20px;}
 .board-scroll{overflow-x:auto;padding:16px 16px 6px;}
 .board{min-width:620px;display:flex;flex-direction:column;gap:6px;}
 .row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
-.row.head{margin-bottom:5px;}
+.row.head{margin-bottom:6px;}
 .head span{
-  font-size:var(--step--1);letter-spacing:.07em;text-transform:uppercase;font-weight:700;
-  color:var(--ink);text-align:center;padding:0 2px 8px;
-  border-bottom:2px solid var(--line);
+  font-size:var(--step--1);letter-spacing:.09em;text-transform:uppercase;font-weight:700;
+  color:var(--ink);text-align:center;padding:0 2px 9px;
+  border-bottom:2.5px solid var(--line);
 }
+/* The values are set in the display face so the board speaks with the same
+   voice as the sign at the top of the page. */
 .cell{
-  border-radius:11px;min-height:60px;
+  border-radius:13px;min-height:64px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:6px 5px;
-  font-size:var(--step--1);font-weight:500;line-height:1.25;overflow-wrap:anywhere;
+  text-align:center;padding:7px 6px;
+  font-family:var(--display);font-variation-settings:"opsz" 16;
+  font-size:var(--step--1);font-weight:600;line-height:1.22;
+  letter-spacing:-.005em;overflow-wrap:anywhere;
 }
 /* An unplayed slot should read as absence, not as a result. Keeping it unfilled
    with a faint outline pulls it well clear of the grey no-match cells, which
    otherwise sit at almost the same weight. */
 .cell.empty{background:transparent;border:1.5px dashed var(--line);}
-.cell .mark{font-size:var(--step--2);opacity:.8;letter-spacing:.06em;
-  text-transform:uppercase;margin-top:3px;font-weight:600;}
+.cell .mark{font-size:var(--step--2);opacity:.78;letter-spacing:.07em;
+  text-transform:uppercase;margin-top:4px;font-weight:600;font-family:var(--sans);}
+.cell .mark.tick{font-size:var(--step--1);opacity:.95;margin-top:2px;line-height:1;letter-spacing:0;}
 .cell .clab{display:none;}
-.cell.hit{background:var(--hit-bg);color:var(--hit-fg);}
-.cell.near{background:var(--near-bg);color:var(--near-fg);}
+/* A touch of light across the top of a filled cell, so the three states differ
+   in surface as well as in hue. */
+.cell.hit{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,0) 58%),var(--hit-bg);
+  color:var(--hit-fg);}
+.cell.near{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%),var(--near-bg);
+  color:var(--near-fg);}
 .cell.miss{background:var(--miss-bg);color:var(--miss-fg);}
-.reveal{animation:drop .32s cubic-bezier(.2,.9,.3,1.3) backwards;}
-@keyframes drop{from{transform:translateY(-7px) scale(.94);opacity:0;}}
+.reveal{animation:drop .34s cubic-bezier(.2,.9,.3,1.3) backwards;}
+@keyframes drop{from{transform:translateY(-8px) scale(.93);opacity:0;}}
 .guessed-name{
   grid-column:1 / -1;font-family:var(--display);font-variation-settings:"opsz" 20;
-  font-weight:600;font-size:var(--step-0);color:var(--ink-soft);padding:9px 2px 0;}
-.guessed-name em{font-style:normal;color:var(--strawberry);font-weight:700;}
+  font-weight:600;font-size:var(--step-0);color:var(--ink-soft);padding:10px 2px 0;}
+.guessed-name em{font-style:normal;color:var(--strawberry);font-weight:800;}
 
 .boardfoot{display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;padding:10px 16px 16px;}
+  gap:12px;flex-wrap:wrap;padding:12px 16px 16px;}
+/* A cloakroom ticket, notched out of the panel it sits on. */
 .ticket{
-  display:inline-flex;align-items:center;gap:9px;padding:8px 16px;
-  background:var(--strawberry-soft);border-radius:999px;
+  position:relative;
+  display:inline-flex;align-items:center;gap:9px;padding:9px 20px;
+  background:var(--strawberry-soft);
+  border-radius:7px;
   font-size:var(--step--1);font-weight:500;color:var(--ink);
 }
+.ticket::before,.ticket::after{
+  content:"";position:absolute;top:50%;transform:translateY(-50%);
+  width:12px;height:12px;border-radius:50%;background:var(--surface);
+}
+.ticket::before{left:-6px;}
+.ticket::after{right:-6px;}
 .ticket .n{
   font-family:var(--display);font-variation-settings:"opsz" 20;
-  font-size:var(--step-1);font-weight:700;color:var(--strawberry);
+  font-size:var(--step-1);font-weight:800;color:var(--strawberry-deep);
   font-variant-numeric:tabular-nums;
   display:inline-block;transition:transform .3s cubic-bezier(.2,.9,.3,1.5);
 }
-.ticket .n.ticking{transform:scale(1.16);}
+.ticket .n.ticking{transform:scale(1.18);}
 .boardfoot .legend{margin:0;}
 
 .entry{padding:16px;position:relative;}
 .entry-row{display:flex;gap:9px;}
-.hint{margin:10px 3px 1px;font-size:var(--step--1);color:var(--ink-soft);}
-.hint b{color:var(--strawberry);font-weight:600;}
-.entry-foot{display:flex;justify-content:center;margin-top:11px;}
+.hint{margin:11px 3px 1px;font-size:var(--step--1);color:var(--ink-soft);}
+.hint b{color:var(--strawberry);font-weight:700;}
+.entry-foot{display:flex;justify-content:center;margin-top:12px;}
 .linkbtn{
-  background:none;border:none;color:var(--ink-soft);font-size:var(--step--1);
+  background:none;border:none;box-shadow:none;color:var(--ink-soft);font-size:var(--step--1);
   font-weight:400;padding:4px 8px;text-decoration:underline;text-underline-offset:3px;
   text-decoration-color:var(--line);
 }
-.linkbtn:hover:not(:disabled){
-  background:none;filter:none;transform:none;
+.linkbtn:hover:not(:disabled),.linkbtn:active:not(:disabled){
+  background:none;filter:none;transform:none;box-shadow:none;
   color:var(--strawberry);text-decoration-color:var(--strawberry);
 }
 input[type="text"]{
   flex:1;min-width:0;font-family:var(--sans);font-size:var(--step-0);font-weight:400;
-  padding:13px 15px;border:1.5px solid var(--line);border-radius:11px;
+  padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;
   background:var(--surface-2);color:var(--ink);
 }
 input::placeholder{color:var(--ink-soft);opacity:.85;}
+/* Buttons sit on a solid lip and press down onto it. */
 button{
   font-family:var(--sans);font-size:var(--step-0);font-weight:600;
-  padding:13px 22px;border:none;border-radius:11px;
+  padding:13px 22px;border:none;border-radius:12px;
   background:var(--strawberry);color:#FFF8F9;cursor:pointer;
-  transition:transform .12s ease, filter .12s ease;
+  box-shadow:0 3px 0 var(--strawberry-deep);
+  transition:transform .1s ease, box-shadow .1s ease, filter .12s ease;
 }
-button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px);}
-button:active:not(:disabled){transform:translateY(0);}
-button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowed;}
-.ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);}
-.ghost:hover:not(:disabled){filter:none;background:var(--surface-2);}
+button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px);
+  box-shadow:0 4px 0 var(--strawberry-deep);}
+button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--strawberry-deep);}
+button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowed;
+  box-shadow:0 3px 0 var(--line);}
+.ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);
+  box-shadow:0 3px 0 var(--line-soft);}
+.ghost:hover:not(:disabled){filter:none;background:var(--surface-2);
+  box-shadow:0 4px 0 var(--line-soft);}
+.ghost:active:not(:disabled){box-shadow:0 1px 0 var(--line-soft);}
 
 .menu{
   position:absolute;left:16px;right:16px;top:calc(100% - 6px);z-index:20;
   max-height:280px;overflow-y:auto;
-  background:var(--surface);border:1.5px solid var(--line);border-radius:13px;
-  box-shadow:0 12px 26px var(--shadow);padding:5px;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:14px;
+  box-shadow:0 14px 30px var(--shadow);padding:5px;
 }
 .menu ul{margin:0;padding:0;}
 .menu li{
-  list-style:none;padding:9px 12px;border-radius:9px;cursor:pointer;
+  list-style:none;padding:9px 12px;border-radius:10px;cursor:pointer;
   font-weight:400;display:flex;justify-content:space-between;gap:10px;align-items:baseline;
 }
 .menu li .from{color:var(--ink-soft);font-size:var(--step--1);flex:none;}
@@ -393,118 +474,137 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
 .menu li.used{opacity:.42;cursor:not-allowed;}
 .menu li.used .from{font-style:italic;}
 .menu-note{padding:8px 12px 4px;font-size:var(--step--2);color:var(--ink-soft);
-  letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
+  letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
 
-.result{padding:24px;text-align:center;}
+/* The reveal is the payoff, so it gets a wash of colour behind the verdict
+   rather than arriving as one more cream box like all the others. */
+.result{
+  padding:28px 24px 26px;text-align:center;
+  background:linear-gradient(180deg,var(--strawberry-soft) 0,var(--surface) 210px);
+}
 .verdict{
   font-family:var(--display);font-variation-settings:"opsz" 72;
-  font-weight:800;font-size:var(--step-3);line-height:1.05;margin:0 0 4px;
-  letter-spacing:-.02em;text-wrap:balance;
+  font-weight:800;font-size:var(--step-3);line-height:1.02;margin:0 0 6px;
+  letter-spacing:-.03em;text-wrap:balance;
 }
 .answer-name{
   font-family:var(--display);font-variation-settings:"opsz" 40;
-  font-weight:700;font-size:var(--step-2);color:var(--strawberry);margin:0 0 14px;
-  letter-spacing:-.015em;
+  font-weight:800;font-size:var(--step-2);color:var(--strawberry-deep);margin:0 0 16px;
+  letter-spacing:-.022em;
 }
-.score{display:inline-flex;align-items:baseline;gap:8px;
-  background:var(--surface-2);border-radius:999px;padding:7px 19px;margin:0 0 18px;}
+.score{display:inline-flex;align-items:baseline;gap:9px;
+  background:var(--surface-2);border:1.5px solid var(--line);
+  border-radius:999px;padding:7px 20px;margin:0 0 20px;
+  box-shadow:2px 2px 0 var(--shadow);}
 .score b{
   font-family:var(--display);font-variation-settings:"opsz" 30;
-  font-size:var(--step-2);font-weight:700;color:var(--pistachio);font-variant-numeric:tabular-nums;
+  font-size:var(--step-2);font-weight:800;color:var(--pistachio);font-variant-numeric:tabular-nums;
 }
-.score span{font-size:var(--step--1);letter-spacing:.09em;text-transform:uppercase;
-  font-weight:500;color:var(--ink-soft);}
+.score span{font-size:var(--step--1);letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--ink-soft);}
 .fact{
   text-align:left;background:var(--surface-2);
-  border-left:4px solid var(--butterscotch);border-radius:0 11px 11px 0;
-  padding:14px 17px;margin:0;font-size:var(--step-0);line-height:1.65;
+  border-left:5px solid var(--butterscotch);border-radius:0 12px 12px 0;
+  padding:15px 18px;margin:0;font-size:var(--step-0);line-height:1.68;
 }
-.fact + .fact{margin-top:10px;}
+.fact + .fact{margin-top:11px;}
 .fact.trivia{border-left-color:var(--strawberry);}
-.fact b{display:block;font-size:var(--step--2);letter-spacing:.12em;
-  text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
+.fact b{display:block;font-size:var(--step--2);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;font-weight:700;}
 
-.lastlick{padding:24px;}
+.lastlick{padding:26px 24px;}
 .lastlick h2{
   font-family:var(--display);font-variation-settings:"opsz" 60;
-  font-weight:800;font-size:var(--step-2);margin:0 0 5px;text-align:center;letter-spacing:-.02em;
+  font-weight:800;font-size:var(--step-2);margin:0 0 6px;text-align:center;letter-spacing:-.025em;
 }
 .lastlick .sub{text-align:center;color:var(--ink-soft);font-size:var(--step--1);
-  margin:0 auto 16px;max-width:46ch;}
-.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;
-  max-height:230px;overflow-y:auto;}
+  margin:0 auto 18px;max-width:46ch;line-height:1.6;}
+.chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-bottom:18px;
+  max-height:230px;overflow-y:auto;padding:3px;}
 .chip{
   font-family:var(--sans);font-size:var(--step--1);font-weight:500;
-  padding:9px 15px;border-radius:999px;
+  padding:9px 16px;border-radius:999px;
   background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);
-  cursor:pointer;transition:transform .12s ease;
+  cursor:pointer;box-shadow:0 2px 0 var(--line);
+  transition:transform .12s ease, box-shadow .12s ease;
 }
-.chip:hover{background:var(--strawberry-soft);border-color:var(--strawberry);transform:translateY(-1px);}
-.chip[aria-pressed="true"]{background:var(--strawberry);border-color:var(--strawberry);color:#FFF8F9;}
-.lastlick .actions{margin-top:16px;}
+.chip:hover{background:var(--strawberry-soft);border-color:var(--strawberry);
+  transform:translateY(-2px);box-shadow:0 4px 0 var(--strawberry-soft);}
+.chip[aria-pressed="true"]{background:var(--strawberry);border-color:var(--strawberry-deep);
+  color:#FFF8F9;box-shadow:0 2px 0 var(--strawberry-deep);transform:none;}
+.lastlick .actions{margin-top:18px;}
 
-.stats{padding:24px;}
+.stats{padding:26px 24px;}
 .stats h2{font-family:var(--display);font-variation-settings:"opsz" 60;
-  font-weight:700;font-size:var(--step-1);margin:0 0 3px;letter-spacing:-.01em;}
-.stats .note{font-size:var(--step--1);color:var(--ink-soft);margin:0 0 18px;}
+  font-weight:800;font-size:var(--step-1);margin:0 0 4px;letter-spacing:-.018em;}
+.stats .note{font-size:var(--step--1);color:var(--ink-soft);margin:0 0 20px;max-width:58ch;}
 /* A fixed three across never leaves a single tile stranded on its own row the
    way a wrapping flex row does with six of them. */
-.mine{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-.mine div{background:var(--surface-2);border-radius:11px;padding:11px 6px;text-align:center;}
-.mine div.lead{background:var(--strawberry-soft);}
-.mine div.lead strong{color:var(--strawberry);}
+.mine{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px;}
+.mine div{background:var(--surface-2);border:1.5px solid var(--line);
+  border-radius:13px;padding:12px 6px;text-align:center;}
+.mine div.lead{background:var(--strawberry-deep);border-color:var(--strawberry-deep);
+  box-shadow:0 3px 0 rgba(0,0,0,.2);}
+.mine div.lead strong{color:#FFF8F9;}
+.mine div.lead span{color:#FFF8F9;}
 .mine strong{display:block;font-family:var(--display);font-variation-settings:"opsz" 30;
-  font-size:var(--step-2);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;}
-.mine span{font-size:var(--step--2);letter-spacing:.06em;text-transform:uppercase;
-  color:var(--ink-soft);font-weight:500;}
+  font-size:var(--step-2);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;}
+.mine span{font-size:var(--step--2);letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:600;}
 
 .histlist{display:flex;flex-direction:column;gap:2px;}
-.hrow{display:grid;grid-template-columns:86px 1fr auto 52px;gap:10px;align-items:baseline;
-  padding:9px 11px;border-radius:9px;font-size:var(--step--1);}
+.hrow{display:grid;grid-template-columns:90px 1fr auto 54px;gap:10px;align-items:baseline;
+  padding:10px 12px;border-radius:10px;font-size:var(--step--1);}
 .hrow:nth-child(odd){background:var(--surface-2);}
 .hrow .num{color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap;}
-.hrow .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.hrow .rs{font-size:var(--step--2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.hrow .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hrow .rs{font-size:var(--step--2);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
 .hrow .rs.ok{color:var(--pistachio);}
 .hrow .rs.save{color:var(--butterscotch);}
 .hrow .rs.gone{color:var(--ink-soft);}
-.hrow .pt{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;}
+.hrow .pt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;}
 .histempty{color:var(--ink-soft);font-size:var(--step--1);padding:6px 2px;}
 
-.actions{display:flex;gap:9px;margin-top:20px;}
+.actions{display:flex;gap:10px;margin-top:22px;}
 .actions button{flex:1;}
 footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
-  padding-top:26px;line-height:1.8;}
+  padding-top:30px;line-height:1.85;}
 [hidden]{display:none !important;}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
+
 /* Below this width the six columns will not fit side by side without shrinking
    the text past readable, so each guess wraps into two rows of three instead
    and the header row gives way to a label inside every cell. Desktop never
    evaluates any of this. */
-@media (max-width:520px){
+@media (max-width:560px){
   .board{min-width:0;}
   .board-scroll{padding:14px 14px 4px;overflow-x:visible;}
   .row{grid-template-columns:repeat(3,1fr);gap:5px;}
   .row.head{display:none;}
   .demo-grid, .answer-row{grid-template-columns:repeat(3,1fr);}
-  .cell{min-height:64px;padding:7px 5px;}
-  .cell.empty{min-height:40px;}
+  .cell{min-height:68px;padding:8px 5px;}
+  .cell.empty{min-height:42px;}
   .cell .clab{
-    display:block;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
-    font-weight:600;opacity:.62;margin-bottom:3px;line-height:1.1;
+    display:block;font-family:var(--sans);font-size:.6rem;letter-spacing:.06em;
+    text-transform:uppercase;font-weight:700;opacity:.62;margin-bottom:4px;line-height:1.1;
   }
   .cell.empty .clab{opacity:.5;margin-bottom:0;}
-  .guessed-name{padding:10px 2px 1px;}
+  .guessed-name{padding:11px 2px 1px;}
 }
-@media (max-width:520px){
-  .topbar{position:static;display:flex;justify-content:flex-end;padding-top:14px;}
-  .masthead{padding:14px 0 4px;gap:13px;}
+@media (max-width:560px){
+  .masthead{padding:20px 18px 16px;gap:13px;}
 }
 @media (max-width:460px){
   h1{font-size:var(--step-3);}
-  .masthead svg{width:52px;height:61px;}
-  .wrap{padding:0 12px 56px;}
+  .masthead{flex-direction:column;text-align:center;gap:10px;}
+  .namebox{text-align:center;}
+  .tagline{max-width:none;}
+  .masthead svg{width:56px;height:66px;}
+  .wrap{padding:0 12px 60px;}
   .boardfoot{justify-content:center;}
+  .result{padding:24px 18px;}
+  .lastlick,.stats{padding:22px 18px;}
+  .mine{gap:7px;}
 }
 </style>
 </head>
@@ -520,19 +620,25 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
     </button>
   </div>
 
-  <header class="masthead">
-    <svg width="68" height="80" viewBox="0 0 54 64" aria-hidden="true">
-      <path d="M16 34 L27 61 L38 34 Z" fill="#E8B45F"/>
-      <path d="M18 39 H36 M20.2 45 H33.8 M22.4 51 H31.6" stroke="#BE8B3B" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="27" cy="28" r="12" fill="#D9647A"/>
-      <circle cx="20" cy="17" r="9" fill="#FFFCF6"/>
-      <circle cx="34" cy="18" r="8.5" fill="#8FB57A"/>
-      <circle cx="27" cy="9" r="3.8" fill="#C0435C"/>
-    </svg>
-    <h1>The Daily Scoop</h1>
-  </header>
-  <p class="tagline">Guess the ice cream flavour of the day from six clues.</p>
-  <p class="eyebrow" id="eyebrow"></p>
+  <div class="signboard">
+    <header class="masthead">
+      <span class="cone">
+        <svg width="68" height="80" viewBox="0 0 54 64" aria-hidden="true">
+          <path d="M16 34 L27 61 L38 34 Z" fill="#E8B45F"/>
+          <path d="M18 39 H36 M20.2 45 H33.8 M22.4 51 H31.6" stroke="#BE8B3B" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="27" cy="28" r="12" fill="#D9647A"/>
+          <circle cx="20" cy="17" r="9" fill="#FFFCF6"/>
+          <circle cx="34" cy="18" r="8.5" fill="#8FB57A"/>
+          <circle cx="27" cy="9" r="3.8" fill="#C0435C"/>
+        </svg>
+      </span>
+      <div class="namebox">
+        <h1>The Daily Scoop</h1>
+        <p class="tagline">Guess the ice cream flavour of the day from six clues.</p>
+      </div>
+    </header>
+    <p class="eyebrow" id="eyebrow"></p>
+  </div>
 
   <div class="stack">
 
@@ -1457,8 +1563,14 @@ FLAVOURS.forEach(function(f, i){ if(f.pool === "A") ANSWER_ORDER.push(i); });
   }
 })();
 
-var now = new Date();
-var TODAY = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - EPOCH) / 86400000);
+/* Worked out on demand rather than captured once at load, so a tab left open
+   across midnight can roll itself over instead of quietly serving yesterday's
+   flavour under a heading that says Today. */
+function dayNow(){
+  var d = new Date();
+  return Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - EPOCH) / 86400000);
+}
+var TODAY = dayNow();
 
 function answerFor(day){
   var n = ANSWER_ORDER.length;
@@ -1494,7 +1606,12 @@ function tradState(g, a){
   if(g === a) return "hit";
   return (CONTINENT[g] && CONTINENT[g] === CONTINENT[a]) ? "near" : "miss";
 }
+/* A round holds its guesses as names rather than as rows, so a flavour that
+   left the book between visits, through a rename or a cut, used to arrive here
+   as null and take the whole page down with it. Scoring it as six misses keeps
+   the board standing, and the pruning further down clears the name out for good. */
 function cmp(g, a){
+  if(!g || !a) return [0,0,0,0,0,0].map(function(){ return {t:"\u2014", s:"miss"}; });
   return [
     {t:g.note, s:g.note === a.note ? "hit" : "miss"},
     {t:g.col,  s:g.col  === a.col  ? "hit" : "miss"},
@@ -1505,17 +1622,26 @@ function cmp(g, a){
   ];
 }
 function key(r){ return r.map(function(c){ return c.s; }).join("|"); }
-function byName(n){
-  for(var i = 0; i < FLAVOURS.length; i++){ if(FLAVOURS[i].n === n) return FLAVOURS[i]; }
-  return null;
-}
+/* A null prototype, so a flavour named after something on Object could never
+   collide with the thing it inherits. */
+var BY_NAME = Object.create(null);
+FLAVOURS.forEach(function(f){ BY_NAME[f.n] = f; });
+function byName(n){ return BY_NAME[n] || null; }
 
 /* ---------------- reading what the player meant ----------------
-   Case, apostrophes and spacing should never cost anyone a guess, and neither
-   should a slipped letter. Anything genuinely unrecognisable is still refused,
-   because silently turning nonsense into a real flavour would burn a guess. */
+   Case, accents, ampersands, apostrophes and spacing should never cost anyone a
+   guess, and neither should a slipped letter. Folding the accents is what lets
+   creme brulee find the entry that is spelled properly, and turning an ampersand
+   into the word is what lets cookies & cream land where anyone would expect it.
+   Anything genuinely unrecognisable is still refused, because silently turning
+   nonsense into a real flavour would burn a guess. */
 function norm(s){
-  return String(s).toLowerCase()
+  var t = String(s);
+  /* An engine without Unicode normalisation simply keeps its accents, which is
+     exactly what this did before, so there is nothing to lose by trying. */
+  try{ t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }catch(e){}
+  return t.toLowerCase()
+    .replace(/&/g, " and ")
     .replace(/[''`.,!?]/g, "")
     .replace(/[-_/]/g, " ")
     .replace(/\s+/g, " ")
@@ -1523,12 +1649,75 @@ function norm(s){
 }
 function squash(s){ return norm(s).replace(/ /g, ""); }
 
-var BY_NORM = {}, BY_SQUASH = {};
+/* Null prototypes, because these are keyed by whatever somebody types into the
+   box. A plain object inherits a property called constructor, so typing that one
+   word used to come back with the Object function standing in for a flavour: the
+   Scoop button lit up, the guess was saved with no name attached, and the board
+   threw on the way to drawing it. Since the save landed first, the round stayed
+   broken on every later visit, and the button that clears storage sits inside a
+   panel that never got built. One dictionary word, and the page was gone. */
+var BY_NORM = Object.create(null), BY_SQUASH = Object.create(null);
 FLAVOURS.forEach(function(f){
   BY_NORM[norm(f.n)] = f;
   var sq = squash(f.n);
   if(!BY_SQUASH[sq]) BY_SQUASH[sq] = f;
 });
+
+/* The book is written in British English and names each flavour the way a cook
+   would name it, but plenty of people will type the American name, the brand
+   name, or the longer name they grew up with. None of those are wrong, so none
+   of them should be turned away. Every entry here points at a flavour already in
+   the book, and the box still says which one it read, so nobody is ever quietly
+   handed something they did not ask for. */
+var ALIASES = {
+  "Mint Chocolate Chip":"Mint Choc Chip", "Mint Chip":"Mint Choc Chip",
+  "Chocolate Chip Mint":"Mint Choc Chip", "Choc Mint":"Mint Choc Chip",
+  "Cotton Candy":"Candy Floss",
+  "Licorice":"Liquorice", "Salty Licorice":"Salty Liquorice",
+  "Licorice Allsorts":"Liquorice Allsorts",
+  "Frozen Yogurt":"Frozen Yoghurt", "Froyo":"Frozen Yoghurt",
+  "Greek Yogurt":"Greek Yoghurt",
+  "Whiskey":"Whisky", "Chili":"Chilli", "Chocolate Chili":"Chocolate Chilli",
+  "Beet":"Beetroot", "Kiwi":"Kiwifruit",
+  "Oreo":"Cookies and Cream", "Oreos":"Cookies and Cream",
+  "Chocolate Chip Cookie Dough":"Cookie Dough",
+  "Sea Salt Caramel":"Salted Caramel", "Salted Caramel Swirl":"Salted Caramel",
+  "Caramel Swirl":"Caramel", "Butterscotch Ripple":"Butterscotch",
+  "Creamsicle":"Orange Creamsicle", "Dreamsicle":"Orange Creamsicle",
+  "Root Beer":"Root Beer Float",
+  "Mango":"Mango Sorbet",
+  "Passion Fruit":"Passionfruit Sorbet", "Passionfruit":"Passionfruit Sorbet",
+  "PBJ":"Peanut Butter and Jelly", "PB and J":"Peanut Butter and Jelly",
+  "Peanut Butter Jelly":"Peanut Butter and Jelly",
+  "Nutella":"Chocolate Hazelnut",
+  "Speculoos":"Biscoff", "Cookie Butter":"Biscoff",
+  "Boba":"Brown Sugar Boba", "Bubble Tea":"Milk Tea",
+  "Purple Yam":"Ube", "Azuki":"Red Bean", "Adzuki":"Red Bean",
+  "Funfetti":"Birthday Cake", "Confetti Cake":"Birthday Cake",
+  "Banoffee Pie":"Banoffee", "Sticky Toffee Pudding":"Sticky Toffee",
+  "Choc Chip":"Chocolate Chip",
+  "Chocolate Brownie":"Chocolate Fudge Brownie",
+  "Fudge Brownie":"Chocolate Fudge Brownie",
+  "Rum and Raisin":"Rum Raisin",
+  "Matcha Green Tea":"Matcha", "Green Tea Matcha":"Matcha",
+  "Key Lime":"Key Lime Pie", "Coffee Chip":"Espresso Chip"
+};
+var BY_ALIAS = Object.create(null);
+Object.keys(ALIASES).forEach(function(k){
+  var target = BY_NAME[ALIASES[k]];
+  /* An alias pointing at a flavour that is no longer in the book is dropped
+     rather than trusted, so editing the book can never revive a dead name. */
+  if(target) BY_ALIAS[norm(k)] = target;
+});
+
+/* People say the whole thing out loud. Vanilla ice cream, pistachio gelato, and
+   so on down the counter. Sorbet is deliberately left alone, because a good few
+   flavours in the book genuinely end in it and stripping it would send mango
+   sorbet somewhere it has no business going. */
+function trimTrailer(s){
+  var t = s.replace(/\s+(ice ?cream|icecream|gelato|frozen yogh?urt|flavou?rs?)$/, "").trim();
+  return (t && t !== s) ? t : null;
+}
 
 /* Famous flavours win a tie against obscure ones, since that is almost always
    what somebody fumbling a spelling actually meant. */
@@ -1559,16 +1748,31 @@ function lev(a, b, max){
   return prev[n];
 }
 
-function resolve(raw){
-  var s = norm(raw);
+function lookup(s){
   if(!s) return null;
   if(BY_NORM[s]) return BY_NORM[s];
+  if(BY_ALIAS[s]) return BY_ALIAS[s];
 
-  var sq = squash(raw);
+  var sq = s.replace(/ /g, "");
   if(BY_SQUASH[sq]) return BY_SQUASH[sq];
 
+  /* A name beginning with what was typed is far stronger evidence than one
+     sitting a couple of edits away, so every prefix is settled before the fuzzy
+     pass runs at all. Mango used to land on Sago for want of this, because
+     neither mango entry was close enough to beat an unrelated four letter word.
+     Ties go to the better known flavour and then to the shorter name, and a tie
+     surviving both is refused rather than guessed at. */
   var pre = FLAVOURS.filter(function(f){ return norm(f.n).indexOf(s) === 0; });
   if(pre.length === 1) return pre[0];
+  if(pre.length > 1){
+    pre.sort(function(a, b){
+      return POOL_RANK[a.pool] - POOL_RANK[b.pool] ||
+             a.n.length - b.n.length || a.n.localeCompare(b.n);
+    });
+    var w = pre[0], r = pre[1];
+    if(POOL_RANK[w.pool] !== POOL_RANK[r.pool] || w.n.length !== r.n.length) return w;
+    return null;
+  }
 
   /* One slip on a short word, three on a long one. Ties are broken first by how
      well known the flavour is and then by how much of the opening matches, so
@@ -1586,9 +1790,26 @@ function resolve(raw){
   if(next && next.d === top.d && next.rank === top.rank && next.pre === top.pre) return null;
   return top.f;
 }
+
+/* Two passes at most. What was typed, and then what was typed with the words
+   everybody adds on the end taken off. */
+function resolve(raw){
+  var s = norm(raw);
+  if(!s) return null;
+  var hit = lookup(s);
+  if(!hit){
+    var trimmed = trimTrailer(s);
+    hit = trimmed ? lookup(trimmed) : null;
+  }
+  /* Only ever hand back a row that is genuinely one of the book's own. */
+  return (hit && BY_NAME[hit.n] === hit) ? hit : null;
+}
+/* The answer counts as a candidate even if a pool change has since moved it out
+   of the answer pool, because a last lick that offered nothing capable of being
+   right would be unwinnable through no fault of the player. */
 function survivors(guesses, ans){
   return FLAVOURS.filter(function(c){
-    if(c.pool !== "A") return false;
+    if(c.pool !== "A" && c.n !== ans.n) return false;
     return guesses.every(function(gn){
       return key(cmp(byName(gn), c)) === key(cmp(byName(gn), ans));
     });
@@ -1607,7 +1828,49 @@ if(DB.stats.best === undefined) DB.stats.best = DB.stats.streak || 0;
    punishing anyone for an upgrade they had no part in. */
 if(DB.stats.lastDay === undefined && DB.stats.streak) DB.stats.lastDay = TODAY;
 
-var FIRST_VISIT = !Object.keys(DB.games).length;
+/* Points used to be added up from the saved rounds themselves, which only works
+   for as long as every round is kept forever. Carrying a running total instead
+   is what makes it safe to throw old rounds away below, and this one time
+   migration reads the rounds still present so nobody loses a total they earned. */
+if(DB.stats.points === undefined){
+  DB.stats.points = Object.keys(DB.games).reduce(function(t, k){
+    var g = DB.games[k];
+    return t + ((g && g.phase === "done" && g.points) || 0);
+  }, 0);
+}
+
+/* Two housekeeping passes over the saved rounds.
+
+   The first drops any guess naming a flavour that has since left the book. That
+   name would otherwise reach the board as nothing at all and throw, and because
+   the throw lands before the history panel is built, the button that clears
+   storage would be unreachable, leaving no way out of it from inside the page.
+
+   The second throws away rounds older than the archive reaches. They can never
+   be opened or listed again, so all they were doing was growing without limit. */
+function tidyStorage(){
+  var oldest = TODAY - ARCHIVE_DAYS + 1;
+  var changed = false;
+  Object.keys(DB.games).forEach(function(k){
+    var g = DB.games[k], day = Number(k);
+    if(!g || !g.guesses || day !== day || day < oldest || day > TODAY){
+      delete DB.games[k]; changed = true; return;
+    }
+    var kept = g.guesses.filter(function(n){ return !!byName(n); });
+    if(kept.length !== g.guesses.length){ g.guesses = kept; changed = true; }
+    /* A round left with nothing in it is not worth a row of its own. */
+    if(!kept.length && g.phase === "play"){ delete DB.games[k]; changed = true; }
+  });
+  return changed;
+}
+
+/* Somebody who has opened the page before but never guessed still counts as
+   new, and one flag is a great deal tidier than the blank round per visit that
+   this used to leave lying about. */
+var FIRST_VISIT = !DB.seen;
+DB.seen = true;
+tidyStorage();
+saveDB();
 
 var activeDay, answer, game;
 /* ans is stamped onto a round the moment it is started and never recomputed.
@@ -1657,6 +1920,8 @@ themeBtn.addEventListener("click", function(){
     b.className = "clab"; b.textContent = COLUMNS[j].label;
     d.appendChild(b);
     d.appendChild(document.createTextNode(c.t));
+    var dm = stateMark(c.s);
+    if(dm) d.appendChild(dm);
     demo.appendChild(d);
   });
 
@@ -1730,6 +1995,18 @@ function colLabel(j){
   return b;
 }
 
+/* Green used to carry its meaning in colour alone, which is no help to anyone
+   who cannot separate green from amber. A tick on an exact match, alongside the
+   word that already sat under a close one, makes all three states legible with
+   no colour involved at all. */
+function stateMark(state){
+  if(state !== "hit" && state !== "near") return null;
+  var m = document.createElement("span");
+  m.className = "mark" + (state === "hit" ? " tick" : "");
+  m.textContent = (state === "hit" ? "\u2713" : "close");
+  return m;
+}
+
 /* Only the row that was just played animates. Rebuilding the board re-runs the
    drop on every earlier row otherwise, so the whole history blinks out and back
    each time you guess. */
@@ -1755,11 +2032,8 @@ function render(animateLast){
       if(i === newest) d.style.animationDelay = (j * 0.06) + "s";
       d.appendChild(colLabel(j));
       d.appendChild(document.createTextNode(c.t));
-      if(c.s === "near"){
-        var m = document.createElement("span");
-        m.className = "mark"; m.textContent = "close";
-        d.appendChild(m);
-      }
+      var m = stateMark(c.s);
+      if(m) d.appendChild(m);
       row.appendChild(d);
     });
     rowsEl.appendChild(row);
@@ -1923,9 +2197,11 @@ guessBtn.addEventListener("click", submit);
 
 function submit(){
   var f = resolve(input.value);
-  if(!f || game.guesses.indexOf(f.n) > -1) return;
+  if(!f || !f.n || game.guesses.indexOf(f.n) > -1) return;
   var name = f.n;
   if(!game.ans) game.ans = answer.n;
+  /* The first guess is what commits a round to storage. */
+  DB.games[activeDay] = game;
   game.guesses.push(name);
   input.value = ""; guessBtn.disabled = true; menu.hidden = true;
   entryHint.hidden = true;
@@ -2002,6 +2278,7 @@ function showLick(){
 function finish(outcome, pts, bucket){
   game.phase = "done"; game.points = pts; game.outcome = outcome; game.bucket = bucket;
   DB.stats.played = (DB.stats.played || 0) + 1;
+  DB.stats.points = (DB.stats.points || 0) + pts;
   if(outcome === "won" || outcome === "licked") DB.stats.won = (DB.stats.won || 0) + 1;
   if(activeDay === TODAY){
     var kept = (outcome === "won" || outcome === "licked");
@@ -2039,6 +2316,7 @@ function showResult(){
     d.style.animationDelay = (j * 0.07) + "s";
     d.appendChild(colLabel(j));
     d.appendChild(document.createTextNode(answer[c.key]));
+    d.appendChild(stateMark("hit"));
     ar.appendChild(d);
   });
 
@@ -2059,17 +2337,22 @@ function showStats(){
     return DB.games[d] && DB.games[d].phase === "done";
   }).sort(function(a, b){ return b - a; });
 
-  var totalPts = days.reduce(function(t, d){ return t + (DB.games[d].points || 0); }, 0);
-  var avg = days.length ? (totalPts / days.length).toFixed(1) : "0";
+  /* Rounds and points come from the running totals rather than from the rounds
+     still in storage, because those only reach back as far as the archive does
+     and a lifetime figure that quietly shrank every month would be a lie. */
+  var rounds = s.played || 0;
+  var totalPts = s.points || 0;
+  var avg = rounds ? (totalPts / rounds).toFixed(1) : "0";
   var winPct = s.played ? Math.round((s.won / s.played) * 100) : 0;
 
   document.getElementById("histNote").textContent =
-    "Everything below is kept in this browser and never sent anywhere.";
+    "Everything below is kept in this browser and never sent anywhere. The list " +
+    "reaches back as far as the archive does, and your totals carry on past it.";
 
   var mine = document.getElementById("mine");
   mine.innerHTML = "";
   [[currentStreak(), "Streak", true], [s.best || 0, "Best streak"], [winPct + "%", "Solved"],
-   [days.length, "Rounds"], [totalPts, "Points"], [avg, "Average"]].forEach(function(p){
+   [rounds, "Rounds"], [totalPts, "Points"], [avg, "Average"]].forEach(function(p){
     var d = document.createElement("div");
     if(p[2]) d.className = "lead";
     var st = document.createElement("strong"); st.textContent = p[0];
@@ -2082,7 +2365,9 @@ function showStats(){
   if(!days.length){
     var p = document.createElement("p");
     p.className = "histempty";
-    p.textContent = "Nothing finished yet. Rounds will start collecting here.";
+    p.textContent = rounds
+      ? "Nothing finished inside the last thirty days."
+      : "Nothing finished yet. Rounds will start collecting here.";
     list.appendChild(p);
     return;
   }
@@ -2164,22 +2449,34 @@ function buildArchive(){
     fmtDate(start, {month:"long"}) + " to " + fmtDate(TODAY, {month:"long", year:"numeric"});
 }
 
-function loadDay(day){
-  activeDay = day;
-  if(!DB.games[day]) DB.games[day] = blankGame();
-  game = DB.games[day];
-  answer = (game.ans && byName(game.ans)) || answerFor(day);
-
+/* The heading and the archive bar depend on what day it is now, not only on
+   which day is open, so they are set from one place that midnight can call again
+   without disturbing the round underneath. */
+var rolledOver = false;
+function syncDayChrome(){
   document.getElementById("eyebrow").innerHTML =
-    (day === TODAY ? "Today" : fmtShort(day)) +
-    " &middot; No.&nbsp;<b>" + (day + 1) + "</b> &middot; six guesses";
+    (activeDay === TODAY ? "Today" : fmtShort(activeDay)) +
+    " &middot; No.&nbsp;<b>" + (activeDay + 1) + "</b> &middot; six guesses";
 
   var bar = document.getElementById("archbar");
-  bar.hidden = (day === TODAY);
-  if(day !== TODAY){
+  bar.hidden = (activeDay === TODAY);
+  if(activeDay !== TODAY){
     document.getElementById("archbarText").textContent =
-      "You are playing " + fmtLong(day) + ", from the archive.";
+      (rolledOver && activeDay === TODAY - 1)
+        ? "It has gone midnight, and there is a new flavour waiting."
+        : "You are playing " + fmtLong(activeDay) + ", from the archive.";
   }
+}
+
+function loadDay(day){
+  activeDay = day;
+  rolledOver = false;
+  /* A round only reaches storage once it has a guess in it, so simply looking
+     at a day in the archive no longer leaves a blank one behind. */
+  game = DB.games[day] || blankGame();
+  answer = (game.ans && byName(game.ans)) || answerFor(day);
+
+  syncDayChrome();
 
   document.getElementById("result").hidden = true;
   document.getElementById("lastLick").hidden = true;
@@ -2195,9 +2492,31 @@ function loadDay(day){
   if(game.phase === "done") showResult();
   else if(game.phase === "lick") showLick();
 
-  saveDB();
   window.scrollTo({top:0, behavior:"smooth"});
 }
+
+/* Checked on a timer and again whenever the tab comes back to the front. A round
+   nobody has started simply moves on to the new day, because there is nothing
+   there to lose. Anything else is left where it is and told about it instead,
+   since pulling a board out from under somebody part way through would be far
+   worse than a heading that is briefly out of date. */
+function checkRollover(){
+  var d = dayNow();
+  if(d === TODAY) return;
+  var wasOnToday = (activeDay === TODAY);
+  TODAY = d;
+  rolledOver = true;
+  if(wasOnToday && game.phase === "play" && !game.guesses.length){
+    loadDay(TODAY);
+  } else {
+    syncDayChrome();
+    buildArchive();
+  }
+}
+setInterval(checkRollover, 60000);
+document.addEventListener("visibilitychange", function(){
+  if(!document.hidden) checkRollover();
+});
 
 document.getElementById("giveUpBtn").addEventListener("click", function(){
   if(game.phase !== "play" || !game.guesses.length) return;
@@ -2260,24 +2579,33 @@ shareBtn.addEventListener("click", function(){
     btn.textContent = word;
     setTimeout(function(){ btn.textContent = idle; }, 1600);
   }
-  /* Copy first and always, inside the click, because the clipboard is only
-     reliably writable during a user gesture. The share sheet then opens on top
-     of that, so backing out of it still leaves the result on the clipboard. */
-  var copied = false;
+  /* Write first and inside the click, because the clipboard is only reliably
+     writable during a user gesture. The share sheet then opens on top of that,
+     so backing out of it still leaves the result on the clipboard.
+
+     The write can still be refused, though, and this used to call itself a
+     success the instant it was asked rather than when it was answered, so a
+     refusal showed the word Copied over an empty clipboard and the offer to copy
+     by hand became unreachable. The label now waits for the answer. */
+  var wrote = null;
   if(navigator.clipboard && navigator.clipboard.writeText){
-    try{
-      navigator.clipboard.writeText(text).then(function(){ copied = true; }, function(){});
-      copied = true;
-    }catch(e){}
+    try{ wrote = navigator.clipboard.writeText(text); }catch(e){ wrote = null; }
+  }
+  if(canShare) navigator.share({text: text}).catch(function(){});
+
+  function offerByHand(){
+    btn.textContent = idle;
+    window.prompt("Copy your result:", text);
   }
 
-  if(canShare){
-    flash(copied ? "Copied" : "Shared");
-    navigator.share({text: text}).catch(function(){});
-  } else if(copied){
-    flash("Copied");
+  if(wrote){
+    wrote.then(function(){ flash("Copied"); }, function(){
+      if(canShare) flash("Shared"); else offerByHand();
+    });
+  } else if(canShare){
+    flash("Shared");
   } else {
-    window.prompt("Copy your result:", text);
+    offerByHand();
   }
 });
 
