@@ -23,7 +23,7 @@
 </script>
 <link rel="canonical" href="https://dailyscoop.site/">
 <meta name="theme-color" content="#E9F2EC" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#211A19" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#191E1B" media="(prefers-color-scheme: dark)">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Daily Scoop">
@@ -60,19 +60,25 @@
 /* ---------------------------------------------------------------------------
    The Daily Scoop, parlour signage.
 
-   Same bones as before. The three changes worth naming are that the masthead is
-   now a hanging shop sign rather than a heading, that every raised thing casts
-   the same hard offset shadow so the page reads as printed card rather than as
-   glass, and that the six board cells are set in the display face so the answer
-   values carry the same voice as the title above them.
+   Colour is split into three roles that never borrow from each other.
+
+     State    hit, near and miss. These appear on the board and in the legend
+              that explains the board, and nowhere else. An amber bar on an
+              information block used to teach the reader that amber meant close,
+              and then say something else with it a screen later.
+     Brand    strawberry, in three weights. Identity and emphasis. It fills only
+              the nameplate and the reveal, so a fill still means something.
+     Structure  ground, surface, line, ink. Everything else, including the
+              highlight on the open item in the flavour list, which is passing
+              state and has no business wearing the celebration colour.
+
+   Elevation is also two things, deliberately rather than accidentally.
+   Surfaces are paper and cast down and to the right. Controls are pressable and
+   extrude straight down onto a lip. Nothing on the page blurs a shadow.
+
+   Only the sign and the board are objects. Everything else is text under a rule.
 --------------------------------------------------------------------------- */
 :root{
-  /* The original palette, restored. The ground is a cool mint that leans very
-     slightly blue, and that coolness is what the cream surfaces sit against.
-     An earlier pass here warmed the ground towards yellow, which quietly turned
-     the whole page amber and left the cream with nothing to contrast with.
-     Only three tokens are additions, and all three exist to serve the raised
-     edges and the wash of light that this layout needs. */
   --ground:#E9F2EC;
   --ground-2:#F4FAF5;
   --surface:#FFFCF6;
@@ -81,83 +87,123 @@
   --ink-soft:#7A6659;
   --line:#DCD2C2;
   --line-soft:#E9E0D0;
-  --strawberry:#D9647A;
-  --strawberry-deep:#C24A63;
-  --strawberry-soft:#F4D6DB;
-  --butterscotch:#E8B45F;
-  --pistachio:#5C7C4C;
 
+  --strawberry:#D9647A;
+  --strawberry-soft:#F4D6DB;
+  --rail:#6E5648;
+  /* The brand at two jobs it could not do as one value. A fill that has to
+     carry text on top of it, and the same colour used as small text itself.
+     A mid pink cannot be legible in both directions at once. */
+  --brand-solid:#BC4560;
+  --on-brand:#FFF8F9;
+  --brand-ink:#A03149;
+
+  /* State. Reserved. */
   --hit-bg:#5C7C4C;   --hit-fg:#FBFDF9;
   --near-bg:#E8B45F;  --near-fg:#41301B;
   --miss-bg:#D2C7B3;  --miss-fg:#4E4134;
+  /* The same green and amber as words, for outcomes that are those states. */
+  --say-hit:#4E6B40;
+  --say-near:#7F5A12;
 
   --shadow:rgba(62,47,42,.20);
   --shadow-hard:rgba(62,47,42,.28);
   --awning-shadow:rgba(62,47,42,.22);
   --hatch:rgba(62,47,42,.05);
   --focus:#C24A63;
+  --edge:0 0 0 0 transparent;
 
-  --step--2:.71rem;
-  --step--1:.79rem;
+  /* Every row that is in play stands the same height, whatever its longest
+     value wraps to. Measured against the tallest content in the book, which is
+     a two line tradition sitting under a close label, plus headroom. The rows
+     still to come are deliberately shorter. */
+  --cell-h:72px;
+  --cell-h-blank:46px;
+
+  --r-lg:18px;
+  --r-md:12px;
+  --r-sm:8px;
+
+  --step--2:.72rem;
+  --step--1:.8rem;
   --step-0:.95rem;
-  --step-1:1.14rem;
-  --step-2:1.5rem;
-  --step-3:2.05rem;
-  --step-4:3rem;
+  --step-1:1.15rem;
+  --step-2:1.45rem;
+  --step-3:1.85rem;
+  --step-4:clamp(2rem, 5.4vw, 3rem);
 
   --sans:"Rubik","Segoe UI",system-ui,sans-serif;
   --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
 }
+/* Dark is not the light palette with the values flipped. A black shadow on a
+   near black ground has almost nothing left to darken, so depth is carried by a
+   rim of light along the top edge instead, which is how a raised thing actually
+   reads in a dark room. The ground keeps its cool cast and the surfaces keep
+   their warm one, so the relationship the whole palette is built on survives. */
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --ground:#211A19; --ground-2:#2B2422; --surface:#2C2322; --surface-2:#372B29;
-    --ink:#F2E8DF; --ink-soft:#B3A093; --line:#4A3B37; --line-soft:#3D302D;
-    --strawberry:#EE8C9E; --strawberry-deep:#C05F72; --strawberry-soft:#4C2F35;
-    --butterscotch:#E2AC5C; --pistachio:#8FB57A;
-    --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
+    --ground:#191E1B; --ground-2:#212724; --surface:#2F2A27; --surface-2:#3B3431;
+    --ink:#F4EBE2; --ink-soft:#B6A497; --line:#4C3E39; --line-soft:#3A302C;
+    --strawberry:#EE8C9E; --strawberry-soft:#4C2F35;
+    --rail:#241D1A;
+    --brand-solid:#EE8C9E; --on-brand:#2A1519; --brand-ink:#F2A3B1;
+    --hit-bg:#587A46; --hit-fg:#F5FBEF;
     --near-bg:#C8933F; --near-fg:#241906;
-    --miss-bg:#4E403C; --miss-fg:#C6B6A9;
-    --shadow:rgba(0,0,0,.45); --shadow-hard:rgba(0,0,0,.55);
-    --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+    --miss-bg:#544641; --miss-fg:#CDBDAF;
+    --say-hit:#9DC286; --say-near:#DFAE5E;
+    --shadow:rgba(0,0,0,.55); --shadow-hard:rgba(0,0,0,.66);
+    --awning-shadow:rgba(0,0,0,.6); --hatch:rgba(255,240,230,.04); --focus:#F5A5B4;
+    --edge:inset 0 1px 0 rgba(255,240,230,.075);
   }
 }
 :root[data-theme="dark"]{
-  --ground:#211A19; --ground-2:#2B2422; --surface:#2C2322; --surface-2:#372B29;
-  --ink:#F2E8DF; --ink-soft:#B3A093; --line:#4A3B37; --line-soft:#3D302D;
-  --strawberry:#EE8C9E; --strawberry-deep:#C05F72; --strawberry-soft:#4C2F35;
-  --butterscotch:#E2AC5C; --pistachio:#8FB57A;
-  --hit-bg:#5E7F4C; --hit-fg:#F4FAEE;
+  --ground:#191E1B; --ground-2:#212724; --surface:#2F2A27; --surface-2:#3B3431;
+  --ink:#F4EBE2; --ink-soft:#B6A497; --line:#4C3E39; --line-soft:#3A302C;
+  --strawberry:#EE8C9E; --strawberry-soft:#4C2F35;
+  --rail:#241D1A;
+  --brand-solid:#EE8C9E; --on-brand:#2A1519; --brand-ink:#F2A3B1;
+  --hit-bg:#587A46; --hit-fg:#F5FBEF;
   --near-bg:#C8933F; --near-fg:#241906;
-  --miss-bg:#4E403C; --miss-fg:#C6B6A9;
-  --shadow:rgba(0,0,0,.45); --shadow-hard:rgba(0,0,0,.55);
-  --awning-shadow:rgba(0,0,0,.5); --hatch:rgba(255,240,230,.045); --focus:#F5A5B4;
+  --miss-bg:#544641; --miss-fg:#CDBDAF;
+  --say-hit:#9DC286; --say-near:#DFAE5E;
+  --shadow:rgba(0,0,0,.55); --shadow-hard:rgba(0,0,0,.66);
+  --awning-shadow:rgba(0,0,0,.6); --hatch:rgba(255,240,230,.04); --focus:#F5A5B4;
+  --edge:inset 0 1px 0 rgba(255,240,230,.075);
 }
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-/* A wash of light falling from the awning, with the old crosshatch kept
-   underneath it at about half strength so the ground still has a weave. */
+/* All three layers scroll together. Pinning the light wash while the weave
+   moved under it detached the glow from the awning it is meant to fall from. */
 body{
   background-color:var(--ground);
   background-image:
     repeating-linear-gradient(45deg, var(--hatch) 0 1px, transparent 1px 18px),
     repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 18px),
-    radial-gradient(1100px 460px at 50% -160px, var(--ground-2), transparent 72%);
-  background-attachment:scroll, scroll, fixed;
+    radial-gradient(1100px 420px at 50% -140px, var(--ground-2), transparent 72%);
+  background-attachment:scroll;
   color:var(--ink); font-family:var(--sans); font-size:var(--step-0);
-  line-height:1.62; -webkit-font-smoothing:antialiased;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
 }
-:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px;}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:var(--r-sm);}
 
 /* The shadow has to sit on a wrapper. A filter on the awning itself would be
    applied before the mask and then clipped away with everything else. */
 .awning-wrap{filter:drop-shadow(0 5px 9px var(--awning-shadow));}
+/* The stripe is a clamped proportion rather than a fixed width, because a fixed
+   34px gave a phone about eleven stripes and a wide monitor nearly fifty, and
+   stripe density is most of what separates an awning from a barcode. The dark
+   bar along the top is the rail it hangs from, which is what stops the whole
+   thing reading as a header stripe in fancy dress. */
 .awning{
-  height:76px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.26) 0, rgba(255,255,255,0) 38%,
-                    rgba(0,0,0,.07) 74%, rgba(0,0,0,.15) 100%),
-    repeating-linear-gradient(90deg, var(--strawberry) 0 34px, var(--surface) 34px 68px);
+  height:80px;
+  background-image:
+    linear-gradient(180deg, var(--rail) 0 100%),
+    linear-gradient(180deg, rgba(255,255,255,.24) 0, rgba(255,255,255,0) 40%,
+                    rgba(0,0,0,.08) 76%, rgba(0,0,0,.17) 100%),
+    linear-gradient(90deg, var(--strawberry) 0 50%, var(--surface) 50% 100%);
+  background-size:100% 7px, 100% 100%, clamp(52px, 7.5%, 104px) 100%;
+  background-repeat:no-repeat, no-repeat, repeat-x;
   -webkit-mask:
     linear-gradient(#000 0 0) 0 0/100% calc(100% - 15px) no-repeat,
     radial-gradient(circle 15px at 15px 0, #000 98%, transparent 100%) 0 100%/30px 15px repeat-x;
@@ -167,45 +213,44 @@ body{
 }
 
 .wrap{max-width:760px;margin:0 auto;padding:0 18px 80px;position:relative;}
-/* Sits in the band between the awning and the sign, at every width. Floating it
-   over the corner of the sign put it a few pixels from collision on a mid sized
-   window, and a control that grazes the masthead reads as a mistake. */
 .topbar{display:flex;justify-content:flex-end;padding-top:14px;}
 .themebtn{
   background:var(--surface);border:1.5px solid var(--line);color:var(--ink-soft);
   border-radius:999px;padding:6px 14px 6px 11px;font-size:var(--step--1);font-weight:500;
-  display:inline-flex;align-items:center;gap:8px;box-shadow:2px 2px 0 var(--shadow);
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 2px 0 var(--line), var(--edge);
 }
 .themebtn:hover:not(:disabled){background:var(--surface-2);filter:none;transform:none;
-  box-shadow:2px 2px 0 var(--shadow);}
-.themebtn:active:not(:disabled){transform:translate(1px,1px);box-shadow:1px 1px 0 var(--shadow);}
+  box-shadow:0 2px 0 var(--line), var(--edge);}
+.themebtn:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 0 var(--line), var(--edge);}
 .themebtn i{width:11px;height:11px;border-radius:50%;display:block;flex:none;
   border:1.5px solid var(--ink-soft);}
-.themebtn i.light{background:var(--butterscotch);border-color:var(--butterscotch);}
+.themebtn i.light{background:var(--near-bg);border-color:var(--near-bg);}
 .themebtn i.dark{background:var(--ink-soft);}
-.themebtn i.auto{background:linear-gradient(90deg,var(--butterscotch) 50%,transparent 50%);}
+.themebtn i.auto{background:linear-gradient(90deg,var(--near-bg) 50%,transparent 50%);}
 
 /* ------------------------------------------------------------ the shop sign */
 .signboard{
-  max-width:560px;margin:14px auto 28px;
+  max-width:560px;margin:14px auto 26px;
   background:var(--surface);
   border:1.5px solid var(--line);
-  border-radius:22px;
-  box-shadow:4px 5px 0 var(--shadow-hard);
+  border-radius:var(--r-lg);
+  box-shadow:4px 4px 0 var(--shadow-hard), var(--edge);
   overflow:hidden;
 }
 .masthead{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 24px 18px;}
 .cone{flex:none;display:block;filter:drop-shadow(0 3px 4px var(--shadow));}
 .masthead svg{display:block;width:66px;height:78px;}
 .namebox{text-align:left;min-width:0;}
+/* opsz 96 already tightens the sidebearings, so the tracking here is a nudge
+   rather than the correction it would need at a small optical size. */
 h1{
   font-family:var(--display);
   font-variation-settings:"opsz" 96;
-  font-weight:800;font-size:var(--step-4);line-height:.94;
-  letter-spacing:-.035em;margin:0;text-wrap:balance;
+  font-weight:800;font-size:var(--step-4);line-height:.96;
+  letter-spacing:-.02em;margin:0;text-wrap:balance;
 }
 .tagline{color:var(--ink-soft);font-size:var(--step--1);margin:7px 0 0;line-height:1.45;max-width:30ch;}
-/* The nameplate strip along the bottom of the sign. */
 .eyebrow{
   margin:0;padding:10px 16px;
   background:var(--strawberry-soft);
@@ -213,42 +258,34 @@ h1{
   text-align:center;font-size:var(--step--1);letter-spacing:.13em;
   text-transform:uppercase;color:var(--ink);font-weight:600;
 }
-.eyebrow b{color:var(--strawberry-deep);font-weight:800;}
+.eyebrow b{color:var(--brand-ink);font-weight:800;}
 
 /* ---------------------------------------------------------------- surfaces */
 .panel{
   background:var(--surface);border:1.5px solid var(--line);
-  border-radius:18px;box-shadow:4px 4px 0 var(--shadow);
+  border-radius:var(--r-lg);box-shadow:4px 4px 0 var(--shadow), var(--edge);
 }
 .stack{display:flex;flex-direction:column;gap:18px;}
 
+/* A notice, not a celebration. Outlined so that a strawberry fill still only
+   ever means the sign or the reveal. */
 .archbar{
   display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  background:var(--strawberry-soft);border:1.5px solid var(--strawberry);
-  border-radius:15px;padding:11px 14px;box-shadow:3px 3px 0 var(--shadow);
+  background:var(--surface-2);border:1.5px solid var(--strawberry);
+  border-radius:var(--r-md);padding:11px 14px;
 }
 .archbar span{font-size:var(--step--1);font-weight:500;color:var(--ink);}
 .archbar button{padding:8px 15px;font-size:var(--step--1);}
 
-.help{padding:2px 4px;}
-.deep{margin-top:46px;}
-.nudge{margin-top:16px;}
-#sgForm{display:flex;flex-direction:column;gap:9px;max-width:52ch;}
-#sgForm input[type="text"], #sgForm textarea{
-  font-family:var(--sans);font-size:var(--step-0);font-weight:400;
-  padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;
-  background:var(--surface-2);color:var(--ink);resize:vertical;
-}
-#sgForm .trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
-.sg-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:2px;}
-.sg-msg{font-size:var(--step--1);color:var(--ink-soft);}
-.sg-msg.ok{color:var(--pistachio);font-weight:500;}
-.sg-msg.bad{color:var(--strawberry);font-weight:500;}
-
-details{border-bottom:1.5px solid var(--line-soft);}
-details:last-child{border-bottom:none;}
+/* Demoted. Four equally weighted cards meant nothing on the page was the game.
+   These are now text under a rule, and the board is the only object below the
+   sign. This is almost entirely deletion. */
+.panel.help{background:none;border:none;box-shadow:none;border-radius:0;padding:0;}
+.deep{margin-top:34px;}
+.nudge{margin-top:0;}
+details{border:none;border-top:1.5px solid var(--line);}
 summary{
-  list-style:none;cursor:pointer;padding:15px 18px;
+  list-style:none;cursor:pointer;padding:15px 2px;
   display:flex;align-items:center;gap:11px;
   font-family:var(--display);font-variation-settings:"opsz" 20;
   font-weight:700;font-size:var(--step-1);letter-spacing:-.012em;color:var(--ink);
@@ -260,14 +297,14 @@ summary::after{
   transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s ease;
 }
 details[open] summary::after{transform:rotate(-135deg) translate(-2px,-2px);}
-summary:hover{background:var(--surface-2);border-radius:12px;}
+summary:hover{background:none;color:var(--brand-ink);}
+summary:hover::after{border-color:var(--brand-ink);}
 .badge{
   font-family:var(--display);font-weight:800;font-size:var(--step--1);
-  background:var(--strawberry-deep);color:#FFF8F9;
+  background:var(--brand-solid);color:var(--on-brand);
   border-radius:999px;padding:2px 11px;flex:none;
-  box-shadow:0 2px 0 rgba(0,0,0,.18);
 }
-.help-body{padding:0 18px 22px;font-size:var(--step-0);line-height:1.7;}
+.help-body{padding:0 2px 24px;font-size:var(--step-0);line-height:1.7;}
 .help-body p{margin:0 0 14px;max-width:64ch;}
 .help-body p:last-child{margin-bottom:0;}
 
@@ -277,7 +314,7 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
   font-size:var(--step--1);font-weight:500;color:var(--ink-soft);
   background:var(--surface-2);border-radius:999px;padding:5px 13px 5px 6px;
 }
-.key i{width:16px;height:16px;border-radius:6px;flex:none;
+.key i{width:16px;height:16px;border-radius:var(--r-sm);flex:none;
   display:flex;align-items:center;justify-content:center;}
 .key.k-hit i{background:var(--hit-bg);}
 .key.k-hit i::after{content:"\2713";color:var(--hit-fg);font-size:10px;
@@ -291,14 +328,15 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
   font-weight:700;color:var(--ink-soft);margin:0 0 9px;
 }
 .demo-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
-.demo-grid .cell{min-height:54px;font-size:var(--step--2);}
+.demo-grid .cell{min-height:56px;font-size:var(--step--1);}
 
-.glossary{display:flex;flex-direction:column;gap:13px;margin:6px 0 22px;}
-.gl{background:var(--surface-2);border-radius:14px;padding:15px 17px;
-  border-left:5px solid var(--butterscotch);}
+/* No coloured bar. The heading and the card do the work, and the amber that
+   used to sit here now only ever means one thing. */
+.glossary{display:flex;flex-direction:column;gap:12px;margin:6px 0 22px;}
+.gl{background:var(--surface-2);border-radius:var(--r-md);padding:15px 17px;}
 .gl h3{margin:0 0 6px;font-family:var(--display);font-variation-settings:"opsz" 24;
-  font-weight:700;font-size:var(--step-1);letter-spacing:-.015em;}
-.gl p{margin:0 0 11px;font-size:var(--step--1);color:var(--ink-soft);line-height:1.68;max-width:60ch;}
+  font-weight:700;font-size:var(--step-1);letter-spacing:-.015em;color:var(--brand-ink);}
+.gl p{margin:0 0 11px;font-size:var(--step--1);color:var(--ink-soft);line-height:1.7;max-width:60ch;}
 .gl .vals{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
 .gl .vals span{
   font-size:var(--step--2);font-weight:500;
@@ -308,7 +346,7 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
 .gl .vals span.sep{border:none;background:none;color:var(--ink-soft);padding:3px 2px;}
 .gl .eg{margin:0;font-size:var(--step--1);color:var(--ink);
   border-top:1px dashed var(--line);padding-top:11px;}
-.gl .eg b{color:var(--strawberry);font-weight:700;}
+.gl .eg b{color:var(--brand-ink);font-weight:700;}
 
 .arch-cap{font-size:var(--step--1);color:var(--ink-soft);text-align:center;margin:0 0 11px !important;}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:2px;}
@@ -317,7 +355,7 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
   letter-spacing:.06em;color:var(--ink-soft);font-weight:700;padding-bottom:4px;
 }
 .cal button{
-  aspect-ratio:1;padding:0;border-radius:11px;box-shadow:none;
+  aspect-ratio:1;padding:0;border-radius:var(--r-md);box-shadow:none;
   background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);
   display:flex;align-items:center;justify-content:center;
   font-size:var(--step--1);font-weight:600;font-variant-numeric:tabular-nums;
@@ -346,10 +384,9 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
   background:var(--hit-bg);color:var(--hit-fg);
   border-radius:999px;padding:5px 13px;margin:0;
   font-size:var(--step--1);font-weight:600;line-height:1.4;
-  box-shadow:0 2px 0 rgba(0,0,0,.16);
 }
 .known .kv em{
-  font-style:normal;opacity:.74;font-size:var(--step--2);
+  font-style:normal;font-size:var(--step--2);
   text-transform:uppercase;letter-spacing:.06em;font-weight:500;
 }
 .answer-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 20px;}
@@ -362,58 +399,66 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
   color:var(--ink);text-align:center;padding:0 2px 9px;
   border-bottom:2.5px solid var(--line);
 }
-/* The values are set in the display face so the board speaks with the same
-   voice as the sign at the top of the page. */
+/* Back in Rubik. Bricolage below about a rem, with negative tracking and a
+   chance of breaking mid word inside a narrow box, was voice bought at the cost
+   of the one thing on this page that has to be read at a glance. A step larger
+   as well, because this is the primary content and it was the smallest text. */
 .cell{
-  border-radius:13px;min-height:64px;
+  border-radius:var(--r-md);min-height:var(--cell-h);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:7px 6px;
-  font-family:var(--display);font-variation-settings:"opsz" 16;
-  font-size:var(--step--1);font-weight:600;line-height:1.22;
-  letter-spacing:-.005em;overflow-wrap:anywhere;
+  text-align:center;padding:8px 6px;
+  font-family:var(--sans);font-size:var(--step-0);font-weight:600;line-height:1.25;
+  overflow-wrap:anywhere;
 }
-/* An unplayed slot should read as absence, not as a result. Keeping it unfilled
-   with a faint outline pulls it well clear of the grey no-match cells, which
-   otherwise sit at almost the same weight. */
-.cell.empty{background:transparent;border:1.5px dashed var(--line);}
-.cell .mark{font-size:var(--step--2);opacity:.78;letter-spacing:.07em;
-  text-transform:uppercase;margin-top:4px;font-weight:600;font-family:var(--sans);}
-.cell .mark.tick{font-size:var(--step--1);opacity:.95;margin-top:2px;line-height:1;letter-spacing:0;}
+/* An unplayed slot should read as absence, not as a result. */
+.cell.empty{background:transparent;border:1.5px dashed var(--line);min-height:var(--cell-h-blank);}
+/* The row you are about to fill is an invitation. The ones behind it fall back,
+   so an untouched board reads as one waiting slot instead of six identical
+   empty ones, which is the first thing every new visitor sees. */
+.row.next .cell.empty{border-color:var(--strawberry);border-style:solid;
+  background:var(--surface-2);min-height:var(--cell-h);}
+.row:not(.next) .cell.empty{opacity:.5;}
+/* The board has three zones: what has been played, the row being filled, and
+   the turns still to come. Rows inside a zone keep the board's own gap, and
+   every boundary between zones opens up, so the row you are filling is not
+   pressed against the last result the way it was. Rows here have no gap of
+   their own, the guess label above each result carries that, so this margin is
+   the only air on the board and has to be worth more than the label's. */
+.row:not(.blank) + .row.blank,
+.row.blank + .row.blank{margin-top:14px;}
+/* No opacity on state text. Dropping it to .78 took the label under four and a
+   half to one against its own cell, and it is the only text on the board that
+   carries meaning nothing else repeats. */
+.cell .mark{font-size:var(--step--2);letter-spacing:.07em;
+  text-transform:uppercase;margin-top:4px;font-weight:700;opacity:1;}
+.cell .mark.tick{font-size:var(--step--1);margin-top:2px;line-height:1;letter-spacing:0;}
 .cell .clab{display:none;}
-/* A touch of light across the top of a filled cell, so the three states differ
-   in surface as well as in hue. */
-.cell.hit{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,0) 58%),var(--hit-bg);
-  color:var(--hit-fg);}
-.cell.near{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 58%),var(--near-bg);
-  color:var(--near-fg);}
+.cell.hit{background:var(--hit-bg);color:var(--hit-fg);}
+.cell.near{background:var(--near-bg);color:var(--near-fg);}
 .cell.miss{background:var(--miss-bg);color:var(--miss-fg);}
 .reveal{animation:drop .34s cubic-bezier(.2,.9,.3,1.3) backwards;}
 @keyframes drop{from{transform:translateY(-8px) scale(.93);opacity:0;}}
 .guessed-name{
   grid-column:1 / -1;font-family:var(--display);font-variation-settings:"opsz" 20;
   font-weight:600;font-size:var(--step-0);color:var(--ink-soft);padding:10px 2px 0;}
-.guessed-name em{font-style:normal;color:var(--strawberry);font-weight:800;}
+.guessed-name em{font-style:normal;color:var(--brand-ink);font-weight:800;}
 
 .boardfoot{display:flex;align-items:center;justify-content:space-between;
   gap:12px;flex-wrap:wrap;padding:12px 16px 16px;}
-/* A cloakroom ticket, notched out of the panel it sits on. */
+/* The tear line makes this a ticket without the notches, which only worked
+   while it happened to be sitting on a panel the exact colour they were filled
+   with. This one survives being moved anywhere. */
 .ticket{
-  position:relative;
-  display:inline-flex;align-items:center;gap:9px;padding:9px 20px;
+  display:inline-flex;align-items:center;gap:11px;padding:9px 16px;
   background:var(--strawberry-soft);
-  border-radius:7px;
+  border-radius:var(--r-sm);
   font-size:var(--step--1);font-weight:500;color:var(--ink);
 }
-.ticket::before,.ticket::after{
-  content:"";position:absolute;top:50%;transform:translateY(-50%);
-  width:12px;height:12px;border-radius:50%;background:var(--surface);
-}
-.ticket::before{left:-6px;}
-.ticket::after{right:-6px;}
 .ticket .n{
   font-family:var(--display);font-variation-settings:"opsz" 20;
-  font-size:var(--step-1);font-weight:800;color:var(--strawberry-deep);
+  font-size:var(--step-1);font-weight:800;color:var(--brand-ink);
   font-variant-numeric:tabular-nums;
+  padding-right:11px;border-right:1.5px dashed var(--strawberry);
   display:inline-block;transition:transform .3s cubic-bezier(.2,.9,.3,1.5);
 }
 .ticket .n.ticking{transform:scale(1.18);}
@@ -422,7 +467,7 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
 .entry{padding:16px;position:relative;}
 .entry-row{display:flex;gap:9px;}
 .hint{margin:11px 3px 1px;font-size:var(--step--1);color:var(--ink-soft);}
-.hint b{color:var(--strawberry);font-weight:700;}
+.hint b{color:var(--brand-ink);font-weight:700;}
 .entry-foot{display:flex;justify-content:center;margin-top:12px;}
 .linkbtn{
   background:none;border:none;box-shadow:none;color:var(--ink-soft);font-size:var(--step--1);
@@ -431,25 +476,26 @@ summary:hover{background:var(--surface-2);border-radius:12px;}
 }
 .linkbtn:hover:not(:disabled),.linkbtn:active:not(:disabled){
   background:none;filter:none;transform:none;box-shadow:none;
-  color:var(--strawberry);text-decoration-color:var(--strawberry);
+  color:var(--brand-ink);text-decoration-color:var(--strawberry);
 }
 input[type="text"]{
   flex:1;min-width:0;font-family:var(--sans);font-size:var(--step-0);font-weight:400;
-  padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;
+  padding:13px 15px;border:1.5px solid var(--line);border-radius:var(--r-md);
   background:var(--surface-2);color:var(--ink);
 }
 input::placeholder{color:var(--ink-soft);opacity:.85;}
-/* Buttons sit on a solid lip and press down onto it. */
+/* Controls extrude straight down onto a lip. Surfaces cast down and right.
+   Two light sources, kept apart on purpose: one is paper, one is pressable. */
 button{
   font-family:var(--sans);font-size:var(--step-0);font-weight:600;
-  padding:13px 22px;border:none;border-radius:12px;
-  background:var(--strawberry);color:#FFF8F9;cursor:pointer;
-  box-shadow:0 3px 0 var(--strawberry-deep);
+  padding:13px 22px;border:none;border-radius:var(--r-md);
+  background:var(--brand-solid);color:var(--on-brand);cursor:pointer;
+  box-shadow:0 3px 0 rgba(0,0,0,.22);
   transition:transform .1s ease, box-shadow .1s ease, filter .12s ease;
 }
-button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px);
-  box-shadow:0 4px 0 var(--strawberry-deep);}
-button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--strawberry-deep);}
+button:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px);
+  box-shadow:0 4px 0 rgba(0,0,0,.22);}
+button:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.22);}
 button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowed;
   box-shadow:0 3px 0 var(--line);}
 .ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);
@@ -458,54 +504,60 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
   box-shadow:0 4px 0 var(--line-soft);}
 .ghost:active:not(:disabled){box-shadow:0 1px 0 var(--line-soft);}
 
+/* Paper, so it casts the same shadow every other surface does. A soft blurred
+   drop was the only glass left on a page that had decided not to be glass. */
 .menu{
   position:absolute;left:16px;right:16px;top:calc(100% - 6px);z-index:20;
   max-height:280px;overflow-y:auto;
-  background:var(--surface);border:1.5px solid var(--line);border-radius:14px;
-  box-shadow:0 14px 30px var(--shadow);padding:5px;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:4px 4px 0 var(--shadow-hard), var(--edge);padding:5px;
 }
 .menu ul{margin:0;padding:0;}
 .menu li{
-  list-style:none;padding:9px 12px;border-radius:10px;cursor:pointer;
+  list-style:none;padding:9px 12px;border-radius:var(--r-sm);cursor:pointer;
   font-weight:400;display:flex;justify-content:space-between;gap:10px;align-items:baseline;
 }
 .menu li .from{color:var(--ink-soft);font-size:var(--step--1);flex:none;}
-.menu li[aria-selected="true"]{background:var(--strawberry-soft);}
+/* Passing state, so it is a neutral highlight with an edge, not the colour the
+   page uses to say well done. */
+.menu li[aria-selected="true"]{background:var(--surface-2);
+  box-shadow:inset 3px 0 0 var(--strawberry);}
 .menu li.used{opacity:.42;cursor:not-allowed;}
 .menu li.used .from{font-style:italic;}
 .menu-note{padding:8px 12px 4px;font-size:var(--step--2);color:var(--ink-soft);
   letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
 
-/* The reveal is the payoff, so it gets a wash of colour behind the verdict
-   rather than arriving as one more cream box like all the others. */
+/* The reveal is the one screen seen once a day at the top of the feeling, and
+   the one people photograph, so it is the one place ornament earns its keep. */
 .result{
-  padding:28px 24px 26px;text-align:center;
-  background:linear-gradient(180deg,var(--strawberry-soft) 0,var(--surface) 210px);
+  padding:30px 24px 26px;text-align:center;
+  background:linear-gradient(180deg,var(--strawberry-soft) 0,var(--surface) 220px);
 }
 .verdict{
   font-family:var(--display);font-variation-settings:"opsz" 72;
-  font-weight:800;font-size:var(--step-3);line-height:1.02;margin:0 0 6px;
-  letter-spacing:-.03em;text-wrap:balance;
+  font-weight:800;font-size:var(--step-3);line-height:1.04;margin:0 0 6px;
+  letter-spacing:-.022em;text-wrap:balance;
 }
 .answer-name{
-  font-family:var(--display);font-variation-settings:"opsz" 40;
-  font-weight:800;font-size:var(--step-2);color:var(--strawberry-deep);margin:0 0 16px;
-  letter-spacing:-.022em;
+  font-family:var(--display);font-variation-settings:"opsz" 60;
+  font-weight:800;font-size:calc(var(--step-3) * 1.18);color:var(--brand-ink);
+  margin:0 0 18px;letter-spacing:-.028em;line-height:1.02;text-wrap:balance;
 }
 .score{display:inline-flex;align-items:baseline;gap:9px;
   background:var(--surface-2);border:1.5px solid var(--line);
-  border-radius:999px;padding:7px 20px;margin:0 0 20px;
-  box-shadow:2px 2px 0 var(--shadow);}
+  border-radius:999px;padding:7px 20px;margin:0 0 20px;}
 .score b{
   font-family:var(--display);font-variation-settings:"opsz" 30;
-  font-size:var(--step-2);font-weight:800;color:var(--pistachio);font-variant-numeric:tabular-nums;
+  font-size:var(--step-2);font-weight:800;color:var(--say-hit);font-variant-numeric:tabular-nums;
 }
 .score span{font-size:var(--step--1);letter-spacing:.1em;text-transform:uppercase;
   font-weight:600;color:var(--ink-soft);}
+/* Structure, not state. The bars are the line colour and the brand, never the
+   two hues the board has spent six guesses teaching. */
 .fact{
   text-align:left;background:var(--surface-2);
-  border-left:5px solid var(--butterscotch);border-radius:0 12px 12px 0;
-  padding:15px 18px;margin:0;font-size:var(--step-0);line-height:1.68;
+  border-left:5px solid var(--line);border-radius:0 var(--r-md) var(--r-md) 0;
+  padding:15px 18px;margin:0;font-size:var(--step-0);line-height:1.7;
 }
 .fact + .fact{margin-top:11px;}
 .fact.trivia{border-left-color:var(--strawberry);}
@@ -528,10 +580,15 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
   cursor:pointer;box-shadow:0 2px 0 var(--line);
   transition:transform .12s ease, box-shadow .12s ease;
 }
-.chip:hover{background:var(--strawberry-soft);border-color:var(--strawberry);
-  transform:translateY(-2px);box-shadow:0 4px 0 var(--strawberry-soft);}
-.chip[aria-pressed="true"]{background:var(--strawberry);border-color:var(--strawberry-deep);
-  color:#FFF8F9;box-shadow:0 2px 0 var(--strawberry-deep);transform:none;}
+/* The lip was the same token as the hover fill, so it stopped reading as a lip
+   at exactly the moment it was supposed to lift. */
+/* Needs the same weight as button:hover:not(:disabled) or it never applies.
+   The generic rule was quietly winning, which is why the lip fix did nothing. */
+.chip:hover:not(:disabled){background:var(--strawberry-soft);border-color:var(--strawberry);
+  transform:translateY(-2px);box-shadow:0 4px 0 var(--strawberry);filter:none;}
+.chip[aria-pressed="true"]:not(:disabled){background:var(--brand-solid);
+  border-color:var(--brand-solid);color:var(--on-brand);
+  box-shadow:0 2px 0 rgba(0,0,0,.22);transform:none;filter:none;}
 .lastlick .actions{margin-top:18px;}
 
 .stats{padding:26px 24px;}
@@ -542,11 +599,11 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
    way a wrapping flex row does with six of them. */
 .mine{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px;}
 .mine div{background:var(--surface-2);border:1.5px solid var(--line);
-  border-radius:13px;padding:12px 6px;text-align:center;}
-.mine div.lead{background:var(--strawberry-deep);border-color:var(--strawberry-deep);
-  box-shadow:0 3px 0 rgba(0,0,0,.2);}
-.mine div.lead strong{color:#FFF8F9;}
-.mine div.lead span{color:#FFF8F9;}
+  border-radius:var(--r-md);padding:12px 6px;text-align:center;}
+.mine div.lead{background:var(--brand-solid);border-color:var(--brand-solid);
+  box-shadow:0 3px 0 rgba(0,0,0,.22);}
+.mine div.lead strong{color:var(--on-brand);}
+.mine div.lead span{color:var(--on-brand);}
 .mine strong{display:block;font-family:var(--display);font-variation-settings:"opsz" 30;
   font-size:var(--step-2);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mine span{font-size:var(--step--2);letter-spacing:.07em;text-transform:uppercase;
@@ -554,38 +611,50 @@ button:disabled{background:var(--miss-bg);color:var(--miss-fg);cursor:not-allowe
 
 .histlist{display:flex;flex-direction:column;gap:2px;}
 .hrow{display:grid;grid-template-columns:90px 1fr auto 54px;gap:10px;align-items:baseline;
-  padding:10px 12px;border-radius:10px;font-size:var(--step--1);}
+  padding:10px 12px;border-radius:var(--r-sm);font-size:var(--step--1);}
 .hrow:nth-child(odd){background:var(--surface-2);}
 .hrow .num{color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap;}
 .hrow .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .hrow .rs{font-size:var(--step--2);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
-.hrow .rs.ok{color:var(--pistachio);}
-.hrow .rs.save{color:var(--butterscotch);}
+.hrow .rs.ok{color:var(--say-hit);}
+.hrow .rs.save{color:var(--say-near);}
 .hrow .rs.gone{color:var(--ink-soft);}
 .hrow .pt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;}
 .histempty{color:var(--ink-soft);font-size:var(--step--1);padding:6px 2px;}
 
+#sgForm{display:flex;flex-direction:column;gap:9px;max-width:52ch;}
+#sgForm input[type="text"], #sgForm textarea{
+  font-family:var(--sans);font-size:var(--step-0);font-weight:400;
+  padding:11px 14px;border:1.5px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface-2);color:var(--ink);resize:vertical;
+}
+#sgForm .trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+.sg-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:2px;}
+.sg-msg{font-size:var(--step--1);color:var(--ink-soft);}
+.sg-msg.ok{color:var(--say-hit);font-weight:500;}
+.sg-msg.bad{color:var(--brand-ink);font-weight:500;}
+
 .actions{display:flex;gap:10px;margin-top:22px;}
 .actions button{flex:1;}
 footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
-  padding-top:30px;line-height:1.85;}
+  padding-top:30px;line-height:1.8;}
 [hidden]{display:none !important;}
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
 
-/* Below this width the six columns will not fit side by side without shrinking
-   the text past readable, so each guess wraps into two rows of three instead
-   and the header row gives way to a label inside every cell. Desktop never
-   evaluates any of this. */
-@media (max-width:560px){
+/* The board needs about 690px of window before it fits, so the reflow happens
+   there rather than at 560, which used to leave a band of widths where the game
+   scrolled sideways inside its own card. */
+@media (max-width:700px){
+  /* Taller, because the column label and a two line value both land here. */
+  :root{--cell-h:88px; --cell-h-blank:48px;}
   .board{min-width:0;}
   .board-scroll{padding:14px 14px 4px;overflow-x:visible;}
   .row{grid-template-columns:repeat(3,1fr);gap:5px;}
   .row.head{display:none;}
   .demo-grid, .answer-row{grid-template-columns:repeat(3,1fr);}
-  .cell{min-height:68px;padding:8px 5px;}
-  .cell.empty{min-height:42px;}
+  .cell{padding:8px 5px;}
   .cell .clab{
-    display:block;font-family:var(--sans);font-size:.6rem;letter-spacing:.06em;
+    display:block;font-size:.62rem;letter-spacing:.06em;
     text-transform:uppercase;font-weight:700;opacity:.62;margin-bottom:4px;line-height:1.1;
   }
   .cell.empty .clab{opacity:.5;margin-bottom:0;}
@@ -595,7 +664,6 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
   .masthead{padding:20px 18px 16px;gap:13px;}
 }
 @media (max-width:460px){
-  h1{font-size:var(--step-3);}
   .masthead{flex-direction:column;text-align:center;gap:10px;}
   .namebox{text-align:center;}
   .tagline{max-width:none;}
@@ -2040,7 +2108,12 @@ function render(animateLast){
   });
 
   for(var b = 0; b < Math.max(0, MAX - game.guesses.length); b++){
-    var r = document.createElement("div"); r.className = "row";
+    var r = document.createElement("div");
+    /* The slot about to be filled is drawn as an invitation and the ones behind
+       it fall back, so an untouched board reads as one place to start rather
+       than as six identical empty rows. That board is the first thing every new
+       visitor sees, and it was the weakest screen on the site. */
+    r.className = "row blank" + (b === 0 && game.phase === "play" ? " next" : "");
     for(var k = 0; k < 6; k++){
       var e = document.createElement("div"); e.className = "cell empty";
       e.appendChild(colLabel(k));
