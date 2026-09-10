@@ -399,14 +399,15 @@ summary:hover::after{border-color:var(--brand-ink);}
    cells underneath. */
 .row.head{margin-bottom:6px;grid-template-columns:repeat(6,minmax(0,1fr));}
 .head > span{
-  font-size:var(--step--2);letter-spacing:.05em;text-transform:uppercase;font-weight:700;
-  color:var(--ink);padding:0 1px 9px;min-width:0;
+  font-size:.66rem;letter-spacing:.035em;text-transform:uppercase;font-weight:700;
+  color:var(--ink);padding:0 0 9px;min-width:0;
   border-bottom:2.5px solid var(--line);
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px 5px;
+  display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:4px;
 }
-/* The label keeps its own line. When the column is too narrow to hold the name
-   and the button side by side, the button drops below rather than forcing the
-   column wider, which is what knocked the headings out of line with the board. */
+/* Sized so the longest heading and its button fit on one line inside a single
+   column at the narrowest width the six-across board is ever used at. Letting
+   the button wrap underneath kept the columns aligned but left one heading
+   looking unlike the other five, which was the worse of the two problems. */
 .head .lab{white-space:nowrap;}
 /* Needs the same weight as button:hover:not(:disabled) and its active pair, or
    the generic button rules win and this picks up a lift and a lip it should not
@@ -415,7 +416,7 @@ summary:hover::after{border-color:var(--brand-ink);}
    it reads as two controls competing; a faint letter reads as a footnote, which
    is what this is. The ring arrives on hover and fills once it is open. */
 .colinfo{
-  flex:none;width:15px;height:15px;padding:0;border-radius:50%;
+  flex:none;width:14px;height:14px;padding:0;border-radius:50%;
   background:none;border:none;color:var(--ink-soft);opacity:.55;
   font-family:var(--display);font-variation-settings:"opsz" 14;
   font-size:.72rem;font-weight:700;line-height:1;letter-spacing:0;text-transform:none;
@@ -742,7 +743,7 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
   .head > span{
     border-bottom:none;padding:4px 8px 4px 12px;
     background:var(--surface-2);border-radius:999px;
-    font-size:var(--step--2);gap:7px;flex-wrap:nowrap;
+    font-size:var(--step--2);letter-spacing:.05em;gap:7px;flex-wrap:nowrap;
   }
   .demo-grid, .answer-row{grid-template-columns:repeat(3,1fr);}
   .cell{padding:8px 5px;}
