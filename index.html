@@ -392,12 +392,84 @@ summary:hover::after{border-color:var(--brand-ink);}
 .answer-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0 0 20px;}
 .board-scroll{overflow-x:auto;padding:16px 16px 6px;}
 .board{min-width:620px;display:flex;flex-direction:column;gap:6px;}
-.row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
-.row.head{margin-bottom:6px;}
-.head span{
-  font-size:var(--step--1);letter-spacing:.09em;text-transform:uppercase;font-weight:700;
-  color:var(--ink);text-align:center;padding:0 2px 9px;
+.row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;}
+/* minmax(0,1fr) rather than 1fr, so a heading that cannot fit shrinks instead
+   of stealing width from its neighbours. With a plain 1fr the button pushed
+   Consistency past its minimum and knocked every column out of line with the
+   cells underneath. */
+.row.head{margin-bottom:6px;grid-template-columns:repeat(6,minmax(0,1fr));}
+.head > span{
+  font-size:var(--step--2);letter-spacing:.05em;text-transform:uppercase;font-weight:700;
+  color:var(--ink);padding:0 1px 9px;min-width:0;
   border-bottom:2.5px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px 5px;
+}
+/* The label keeps its own line. When the column is too narrow to hold the name
+   and the button side by side, the button drops below rather than forcing the
+   column wider, which is what knocked the headings out of line with the board. */
+.head .lab{white-space:nowrap;}
+/* Needs the same weight as button:hover:not(:disabled) and its active pair, or
+   the generic button rules win and this picks up a lift and a lip it should not
+   have. Same trap the chips fell into. */
+/* No ring until you go looking for it. A heading with a bordered circle beside
+   it reads as two controls competing; a faint letter reads as a footnote, which
+   is what this is. The ring arrives on hover and fills once it is open. */
+.colinfo{
+  flex:none;width:15px;height:15px;padding:0;border-radius:50%;
+  background:none;border:none;color:var(--ink-soft);opacity:.55;
+  font-family:var(--display);font-variation-settings:"opsz" 14;
+  font-size:.72rem;font-weight:700;line-height:1;letter-spacing:0;text-transform:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:none;cursor:pointer;
+  transition:opacity .12s ease, background-color .12s ease, color .12s ease;
+}
+.colinfo:hover:not(:disabled){
+  background:var(--surface-2);border:none;color:var(--brand-ink);opacity:1;
+  filter:none;transform:none;box-shadow:none;
+}
+.colinfo:active:not(:disabled){transform:none;box-shadow:none;}
+.colinfo[aria-expanded="true"]:not(:disabled){
+  background:var(--brand-solid);border:none;color:var(--on-brand);opacity:1;
+}
+
+/* The short answer, opened from a heading. A line and a list, sat above the
+   board rather than floating over it, so nothing has to be positioned and it
+   behaves the same on a phone as on a desktop. */
+.colnote{
+  position:relative;
+  background:var(--surface-2);border-radius:var(--r-md);
+  padding:13px 44px 13px 15px;
+}
+/* Clicking the heading again closes it and so does Escape, but neither of those
+   announces itself. A cross does. */
+.colnote-x{
+  position:absolute;top:7px;right:7px;
+  width:26px;height:26px;padding:0;border-radius:var(--r-sm);
+  background:none;border:none;box-shadow:none;
+  color:var(--ink-soft);font-family:var(--sans);font-size:1.05rem;
+  font-weight:400;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.colnote-x:hover:not(:disabled){
+  background:var(--surface);color:var(--ink);
+  filter:none;transform:none;box-shadow:none;
+}
+.colnote-x:active:not(:disabled){transform:none;box-shadow:none;}
+.colnote b{
+  display:block;font-family:var(--display);font-variation-settings:"opsz" 20;
+  font-weight:700;font-size:var(--step-0);letter-spacing:-.012em;margin-bottom:4px;
+}
+.colnote p{margin:0 0 10px;font-size:var(--step--1);color:var(--ink-soft);
+  line-height:1.55;max-width:62ch;}
+.colnote .vals{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.colnote .vals span{
+  font-size:var(--step--2);font-weight:500;
+  background:var(--surface);border:1.5px solid var(--line);
+  border-radius:999px;padding:3px 11px;color:var(--ink);
+}
+.colnote .vals span.sep{
+  width:1px;height:15px;padding:0;border:none;border-radius:0;
+  background:var(--line);margin:0 3px;
 }
 /* Back in Rubik. Bricolage below about a rem, with negative tracking and a
    chance of breaking mid word inside a narrow box, was voice bought at the cost
@@ -449,10 +521,23 @@ summary:hover::after{border-color:var(--brand-ink);}
    while it happened to be sitting on a panel the exact colour they were filled
    with. This one survives being moved anywhere. */
 .ticket{
-  display:inline-flex;align-items:center;gap:11px;padding:9px 16px;
+  display:inline-flex;align-items:center;gap:11px;padding:9px 20px;
   background:var(--strawberry-soft);
   border-radius:var(--r-sm);
   font-size:var(--step--1);font-weight:500;color:var(--ink);
+  /* Notched with a mask rather than with two circles painted the colour of
+     whatever happens to sit behind, which is what an earlier version did and
+     which only worked while the ticket stayed on one particular panel. Where
+     mask-composite is missing the two layers simply add up to a plain pill, so
+     the worst case is a ticket without its notches, never one that vanishes. */
+  -webkit-mask:
+    radial-gradient(circle 7px at 0 50%, transparent 97%, #000 100%),
+    radial-gradient(circle 7px at 100% 50%, transparent 97%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask:
+    radial-gradient(circle 7px at 0 50%, transparent 97%, #000 100%),
+    radial-gradient(circle 7px at 100% 50%, transparent 97%, #000 100%);
+  mask-composite: intersect;
 }
 .ticket .n{
   font-family:var(--display);font-variation-settings:"opsz" 20;
@@ -650,7 +735,15 @@ footer{text-align:center;font-size:var(--step--1);color:var(--ink-soft);
   .board{min-width:0;}
   .board-scroll{padding:14px 14px 4px;overflow-x:visible;}
   .row{grid-template-columns:repeat(3,1fr);gap:5px;}
-  .row.head{display:none;}
+  /* The six columns will not line up over three, so the heading row stops being
+     a header and becomes a key. Those screens previously had no column
+     reference at all, and no way to reach these buttons. */
+  .row.head{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .head > span{
+    border-bottom:none;padding:4px 8px 4px 12px;
+    background:var(--surface-2);border-radius:999px;
+    font-size:var(--step--2);gap:7px;flex-wrap:nowrap;
+  }
   .demo-grid, .answer-row{grid-template-columns:repeat(3,1fr);}
   .cell{padding:8px 5px;}
   .cell .clab{
@@ -1587,26 +1680,32 @@ var SITE = "https://dailyscoop.site/";
 
 var COLUMNS = [
   {key:"note", label:"Note",
+   tip:"What it tastes of once you look past the sugar.",
    blurb:"What the flavour actually tastes of once you look past the sugar. Nearly everything in the book is sweet, so what matters here is whatever else is going on alongside it.",
    vals:["Sweet","Creamy","Fruity","Tart","Toasty","Bitter","Salty","Herbal"],
    eg:"Coffee is <b>bitter</b>, salted caramel is <b>salty</b>, and plain chocolate is just <b>sweet</b>."},
   {key:"col", label:"Colour",
+   tip:"The colour of the scoop as you would be handed it.",
    blurb:"The colour of the scoop as you would normally be handed it, food dye and all.",
    vals:["Cream","White","Brown","Tan","Pink","Red","Green","Yellow","Orange","Purple","Grey","Blue","Multi"],
    eg:"Pistachio is <b>green</b>. Neapolitan is <b>multi</b>, because picking any single colour would be dishonest."},
   {key:"con", label:"Consistency",
+   tip:"Whether it is the same thing the whole way through, or has something running through it. The first three are, the rest are not.",
    blurb:"How the flavour is put together. Smooth, icy and chewy are all one thing the whole way through, while rippled, chunky, loaded and layered are not. If your guess lands in the right group but on the wrong value, the cell turns amber.",
    vals:["Smooth","Icy","Chewy","|","Rippled","Chunky","Loaded","Layered"],
    eg:"Rocky road is <b>loaded</b>, meaning it has a soft ripple and hard pieces at the same time. Neapolitan is <b>layered</b>, three blocks sitting side by side."},
   {key:"src", label:"Source",
+   tip:"What the flavour is actually made from.",
    blurb:"Where the flavour actually comes from. This is the column that puts things together in ways none of the others do, and it is usually the one that teaches you something.",
    vals:["Bean or pod","Fruit","Nut","Seed","Leaf","Root","Flower","Spice","Grain","Dairy","Confection"],
    eg:"Vanilla, chocolate and coffee are all <b>bean or pod</b>, which is rarely the first thing anybody thinks of."},
   {key:"trad", label:"Tradition",
+   tip:"The cooking culture it belongs to, rather than where the tub was made.",
    blurb:"The cooking culture a flavour belongs to, rather than wherever the tub happened to be manufactured. Guess the wrong culture from the right continent and the cell turns amber.",
    vals:["American","Italian","British","French","Central European","Nordic","Iberian","Japanese","Chinese","Korean","SE Asian","South Asian","Middle Eastern","Latin American","Antipodean"],
    eg:"Stracciatella is <b>Italian</b> and hokey pokey is <b>Antipodean</b>."},
   {key:"era", label:"Era",
+   tip:"Roughly when it turned up. Classic is older than freezing, parlour covers the soda fountain and the freezer aisle, and modern is the last few decades.",
    blurb:"Roughly when the flavour turned up. Classic means it already existed before mechanical freezing, parlour covers the soda fountain and the post-war freezer aisle, and modern is the last few decades.",
    vals:["Classic","Parlour","Modern"],
    eg:"Lemon sorbet is <b>classic</b>, rocky road is <b>parlour</b>, salted caramel is <b>modern</b>."}
@@ -2162,6 +2261,122 @@ function render(animateLast){
   }
 }
 
+/* After a guess the page eases back up to the top of the board, where the Known
+   row and everything guessed so far are waiting. Not to the top of the document,
+   because the sign and the rules are not what anyone is coming back for, and
+   never downwards, so it can only ever return you to something you already have. */
+function springToBoard(){
+  var panel = document.getElementById("known").parentNode;
+  var top = panel.getBoundingClientRect().top + window.pageYOffset - 14;
+  if(window.pageYOffset <= top + 2) return;
+  top = Math.max(0, top);
+  try{
+    window.scrollTo({top:top, behavior: STILL ? "auto" : "smooth"});
+  }catch(e){ window.scrollTo(0, top); }
+}
+
+/* A short answer beside each column heading. One line and the list of values,
+   and nothing else, because the long version is already sitting in How it works
+   further down and repeating it here would only bury the board. Era is the
+   reason this exists: nothing else on the page says what parlour means without
+   scrolling past the game to find out. */
+(function buildColumnTips(){
+  var board = rowsEl.parentNode;
+  var heads = board.querySelectorAll(".row.head span");
+  if(!heads.length) return;
+
+  var note = document.createElement("div");
+  note.className = "colnote";
+  note.id = "colnote";
+  note.hidden = true;
+
+  /* The cross is built once and the content goes in a body beneath it, because
+     rebuilding the note on every open would throw the cross away with it. */
+  var body = document.createElement("div");
+  var x = document.createElement("button");
+  x.type = "button";
+  x.className = "colnote-x";
+  x.textContent = "×";
+  x.setAttribute("title", "Close");
+  x.setAttribute("aria-label", "Close");
+  note.appendChild(x);
+  note.appendChild(body);
+  board.insertBefore(note, rowsEl);
+
+  var buttons = [], open = -1;
+
+  function shut(){
+    open = -1;
+    note.hidden = true;
+    buttons.forEach(function(b){ b.setAttribute("aria-expanded", "false"); });
+  }
+
+  function show(i){
+    if(open === i){ shut(); return; }
+    open = i;
+    var c = COLUMNS[i];
+    body.innerHTML = "";
+    var h = document.createElement("b");
+    h.textContent = c.label;
+    var p = document.createElement("p");
+    p.textContent = c.tip;
+    var v = document.createElement("div");
+    v.className = "vals";
+    c.vals.forEach(function(val){
+      var s = document.createElement("span");
+      /* The bar in Consistency marks where the family splits, so it stays as a
+         rule rather than becoming a value nobody can pick. */
+      if(val === "|"){ s.className = "sep"; } else { s.textContent = val; }
+      v.appendChild(s);
+    });
+    body.appendChild(h); body.appendChild(p); body.appendChild(v);
+    note.hidden = false;
+    buttons.forEach(function(b, j){
+      b.setAttribute("aria-expanded", j === i ? "true" : "false");
+    });
+  }
+
+  Array.prototype.forEach.call(heads, function(span, i){
+    /* The heading text gets an element of its own so the button beside it can
+       drop onto a second line on a narrow column, instead of widening the
+       column and pulling the whole row out of line with the board below. */
+    var lab = document.createElement("span");
+    lab.className = "lab";
+    lab.textContent = span.textContent;
+    span.textContent = "";
+    span.appendChild(lab);
+
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "colinfo";
+    b.textContent = "i";
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-controls", "colnote");
+    b.setAttribute("title", "What " + COLUMNS[i].label + " means");
+    b.setAttribute("aria-label", "What " + COLUMNS[i].label + " means");
+    b.addEventListener("click", function(){ show(i); });
+    span.appendChild(b);
+    buttons.push(b);
+  });
+
+  x.addEventListener("click", shut);
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && open > -1) shut();
+  });
+
+  /* Anywhere else on the page closes it. The headings are excluded because
+     their own handler is about to run and would otherwise reopen what this
+     just shut. */
+  document.addEventListener("click", function(e){
+    if(open === -1 || note.contains(e.target)) return;
+    for(var k = 0; k < buttons.length; k++){
+      if(buttons[k].contains(e.target)) return;
+    }
+    shut();
+  });
+})();
+
 var input = document.getElementById("guessInput");
 var menu = document.getElementById("menu");
 var menuList = document.getElementById("menuList");
@@ -2285,7 +2500,10 @@ function submit(){
     game.phase = "lick"; saveDB(); render(true); showLick();
   } else {
     saveDB(); render(true);
-    input.focus();
+    /* Keep the caret in the box, but do not let the browser drag the page down
+       to it, because that would immediately undo the spring below. */
+    try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); }
+    springToBoard();
   }
 }
 
