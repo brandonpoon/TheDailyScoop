@@ -1916,7 +1916,7 @@ function lev(a, b, max){
   return prev[n];
 }
 
-function lookup(s){
+function lookup(s, noFuzzy){
   if(!s) return null;
   if(BY_NORM[s]) return BY_NORM[s];
   if(BY_ALIAS[s]) return BY_ALIAS[s];
@@ -1942,6 +1942,8 @@ function lookup(s){
     return null;
   }
 
+  if(noFuzzy) return null;
+
   /* One slip on a short word, three on a long one. Ties are broken first by how
      well known the flavour is and then by how much of the opening matches, so
      starberry lands on Strawberry rather than on Tayberry, which sits at the
@@ -1959,16 +1961,134 @@ function lookup(s){
   return top.f;
 }
 
+/* Tradition is the one column you can search the book by, because it is the one
+   whose values a person already carries around in their head. Nobody types a
+   consistency to narrow a list, but plenty of people know a flavour is Japanese
+   without being able to name it. The other five columns are deliberately left
+   out: being able to ask for everything tart and pink would not be a search, it
+   would be the answer.
+
+   Countries rather than the column's own adjectives, because Japan is what gets
+   typed and Japanese is what the book stores. */
+var COUNTRY_WORDS = {
+  "American":["america","american","usa","united states","states"],
+  "Italian":["italy","italian","sicily","sicilian"],
+  "British":["britain","british","uk","united kingdom","england","english",
+             "scotland","scottish","wales","welsh","ireland","irish"],
+  "French":["france","french"],
+  "Central European":["central europe","central european","germany","german",
+                      "austria","austrian","switzerland","swiss","poland","polish",
+                      "hungary","hungarian","czech","czechia","bavaria","bavarian"],
+  "Nordic":["nordic","scandinavia","scandinavian","sweden","swedish","norway",
+            "norwegian","denmark","danish","finland","finnish","iceland","icelandic"],
+  "Iberian":["iberia","iberian","spain","spanish","portugal","portuguese",
+             "catalan","catalonia"],
+  "Japanese":["japan","japanese"],
+  "Chinese":["china","chinese","taiwan","taiwanese","hong kong"],
+  "Korean":["korea","korean"],
+  "SE Asian":["se asia","se asian","southeast asia","southeast asian",
+              "south east asia","south east asian","thailand","thai","vietnam",
+              "vietnamese","indonesia","indonesian","malaysia","malaysian",
+              "philippines","filipino","singapore","singaporean"],
+  "South Asian":["south asia","south asian","india","indian","pakistan",
+                 "pakistani","sri lanka","sri lankan","bangladesh","nepal"],
+  "Middle Eastern":["middle east","middle eastern","turkey","turkish","iran",
+                    "iranian","persia","persian","lebanon","lebanese","israel",
+                    "israeli","syria","syrian","egypt","egyptian","greece","greek",
+                    "arabia","arabian","morocco","moroccan"],
+  "Latin American":["latin america","latin american","mexico","mexican","brazil",
+                    "brazilian","argentina","argentine","argentinian","peru",
+                    "peruvian","colombia","colombian","cuba","cuban","venezuela",
+                    "caribbean"],
+  "Antipodean":["antipodean","australia","australian","aussie","new zealand","oceania"]
+};
+/* A null prototype, because this is keyed by whatever gets typed. */
+var BY_COUNTRY = Object.create(null);
+Object.keys(COUNTRY_WORDS).forEach(function(t){
+  COUNTRY_WORDS[t].forEach(function(w){ BY_COUNTRY[norm(w)] = t; });
+});
+
+/* Exact and prefix always apply, so Thai can bring up the whole of South East
+   Asia while Thai Tea still sits at the top of the list by name. The fuzzy pass
+   is held back until nothing matched by name at all, which is what stops Chai
+   from quietly dragging in every SE Asian flavour on a single letter of edit
+   distance. */
+/* Damerau rather than plain Levenshtein, and only here. A swapped pair of
+   letters is the commonest typo there is, and plain edit distance charges two
+   for it, which put Mexcio and Spian out of reach of a budget of one. The
+   flavour matcher keeps the simpler version it was tuned with. */
+function levSwap(a, b, max){
+  var m = a.length, n = b.length, i, j;
+  if(Math.abs(m - n) > max) return max + 1;
+  var prev2 = [], prev = [], cur = [];
+  for(j = 0; j <= n; j++) prev[j] = j;
+  for(i = 1; i <= m; i++){
+    cur = [i];
+    var best = i;
+    for(j = 1; j <= n; j++){
+      var cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      var v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      if(i > 1 && j > 1 &&
+         a.charCodeAt(i - 1) === b.charCodeAt(j - 2) &&
+         a.charCodeAt(i - 2) === b.charCodeAt(j - 1)){
+        v = Math.min(v, prev2[j - 2] + 1);
+      }
+      cur[j] = v;
+      if(v < best) best = v;
+    }
+    if(best > max) return max + 1;
+    prev2 = prev; prev = cur;
+  }
+  return prev[n];
+}
+
+function resolveTradition(q, namedAny){
+  if(!q) return null;
+  /* An exact hit needs no length guard, which is what lets UK through. The
+     guard below is for guessing, and guessing from two letters is noise. */
+  if(BY_COUNTRY[q]) return BY_COUNTRY[q];
+  if(q.length < 3) return null;
+
+  var keys = Object.keys(BY_COUNTRY), i, t = null;
+  var pre = keys.filter(function(k){ return k.indexOf(q) === 0; });
+  if(pre.length){
+    t = BY_COUNTRY[pre[0]];
+    for(i = 1; i < pre.length; i++){
+      if(BY_COUNTRY[pre[i]] !== t) return null;
+    }
+    return t;
+  }
+
+  if(namedAny || q.length < 4) return null;
+  var budget = q.length <= 7 ? 1 : 2, best = null, bestD = budget + 1, tied = false;
+  keys.forEach(function(k){
+    var d = levSwap(q, k, budget);
+    if(d > budget) return;
+    if(d < bestD){ bestD = d; best = BY_COUNTRY[k]; tied = false; }
+    else if(d === bestD && BY_COUNTRY[k] !== best){ tied = true; }
+  });
+  return tied ? null : best;
+}
+
 /* Two passes at most. What was typed, and then what was typed with the words
    everybody adds on the end taken off. */
 function resolve(raw){
   var s = norm(raw);
   if(!s) return null;
-  var hit = lookup(s);
-  if(!hit){
-    var trimmed = trimTrailer(s);
-    hit = trimmed ? lookup(trimmed) : null;
-  }
+  var trimmed = trimTrailer(s);
+
+  /* Names first, and only the certain kinds: exact, alias and prefix. This is
+     what keeps Turkish on Turkish Delight and Greek on Greek Yoghurt. */
+  var hit = lookup(s, true) || (trimmed ? lookup(trimmed, true) : null);
+
+  /* Nothing was named. If what was typed is a place, it is a request to narrow
+     the list rather than a fumbled flavour, and a guess dredged up from it would
+     be worse than no guess at all. Japan sits one edit from Paan and Spian sits
+     two, so without this the box would offer Paan to somebody who had just
+     asked to see what Spain had. */
+  if(!hit && resolveTradition(s, false)) return null;
+
+  if(!hit) hit = lookup(s, false) || (trimmed ? lookup(trimmed, false) : null);
   /* Only ever hand back a row that is genuinely one of the book's own. */
   return (hit && BY_NAME[hit.n] === hit) ? hit : null;
 }
@@ -2403,6 +2523,21 @@ function openMenu(){
   matches.sort(function(a, b){
     return matchRank(norm(a.n), q) - matchRank(norm(b.n), q) || a.n.localeCompare(b.n);
   });
+
+  /* A country adds its tradition to the list rather than replacing what matched
+     by name, so asking for Turkish still finds Turkish Delight first and then
+     everything else from that kitchen underneath it. Each row already carries
+     its tradition on the right, so nothing has to explain why they are there. */
+  var named = matches.length;
+  var trad = resolveTradition(q, named > 0);
+  if(trad){
+    var seen = Object.create(null);
+    matches.forEach(function(f){ seen[f.n] = 1; });
+    FLAVOURS.filter(function(f){ return f.trad === trad && !seen[f.n]; })
+      .sort(function(a, b){ return a.n.localeCompare(b.n); })
+      .forEach(function(f){ matches.push(f); });
+  }
+
   menuList.innerHTML = "";
   matches.forEach(function(f, i){
     var used = game.guesses.indexOf(f.n) > -1;
@@ -2417,7 +2552,13 @@ function openMenu(){
     if(!used){ li.addEventListener("mousedown", function(ev){ ev.preventDefault(); pick(f.n); }); }
     menuList.appendChild(li);
   });
-  menuNote.textContent = matches.length + " of " + FLAVOURS.length + " flavours";
+  if(trad && matches.length > named){
+    menuNote.textContent = named
+      ? named + " by name, then " + (matches.length - named) + " " + trad
+      : matches.length + " " + trad + " flavours";
+  } else {
+    menuNote.textContent = matches.length + " of " + FLAVOURS.length + " flavours";
+  }
   menu.hidden = (matches.length === 0);
   input.setAttribute("aria-expanded", String(!menu.hidden));
 }
